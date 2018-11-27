@@ -1,0 +1,48 @@
+DATA Storage Read Me
+
+Okay, so heres how data storage is gonna work.
+
+Under the main data folder, theres gonna be a folder titled FoodDataSets. 
+This will contain all of the used data set files. (in CSV format) 
+NOTE: Whenever the user choses a new data set, we will copy that file into that folder.
+
+FoodListRepository will be used to edit / query that data.
+
+Also under the main folder there will be a single file named "Meals.json".
+This file will contain a mapping between the FoodDataSetFileName and a list of meals.
+EXAMPLE CONTENTS:
+
+{"FoodDataSetFiles" :[
+        {
+            "DataSetFileName": "whatever.txt",
+            "meals": [
+                {
+                    "mealItems" : [
+                        {"quantity": 3, "foodID": "439f1af6-912f-479b-84ac-04c4d0e04a17"},
+                        {"quantity": 2, "foodID": "c5b075fe-8a45-4e6a-9648-5c6d046a9cc4"}
+                    ]
+                }
+            ]
+        },
+        {
+            "DataSetFileName": "anotherSet.csv",
+            "meals": [
+                {
+                    "mealItems" : [
+                        {"quantity": 1, "foodID": "439f1af6-912f-479b-84ac-blahblahblah"},
+                        {"quantity": 2, "foodID": "c5b075fe-8a45-9972-9648-5c6d046a9cc4"},
+                        {"quantity": 9, "foodID": "298e270b-8a45-4e6a-9648-5c6d046a9cc4"}
+                    ]
+                },
+                {
+                    "mealItems" : [
+                        {"quantity": 5, "foodID": "439f1af6-912f-479b-84ac-vlahvlahvlah"}
+                    ]
+                }
+            ]
+        }
+    ]
+}
+
+Tip: you need more IDs, use this: https://www.guidgenerator.com/online-guid-generator.aspx
+This file will be queried with MealListRepository
