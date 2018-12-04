@@ -223,7 +223,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	
         	//Insert into the appropriate child
         	int loc = 0;
-        	while(keys.get(loc).compareTo(key) < 0)
+        	while(keys.get(loc).compareTo(key) < 0 && loc < keys.size())
         		loc++;
         	Node child = children.get(loc);
 			child.insert(key, value);
@@ -231,34 +231,25 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
 			//Split if overflow in child
 			if (child.isOverflow()) {
 				
-				//Search for location to insert child based on key
+				//Search for location to insert child based on sibling's first key
 				Node sibling = child.split();
 				loc = 0;
 	        	while(keys.get(loc).compareTo(sibling.getFirstLeafKey()) < 0)
 	        		loc++;
-	        	
-	        	//TODO fix this
-				
-				//If key is found
-				if (loc >= 0) 
-					children.set(loc + 1, sibling);
-				
-				//Else insert key into list
-				else {
-					keys.add(-loc - 1, key);
-					children.add(-loc, sibling);
-				}
+	        	keys.add(loc, sibling.getFirstLeafKey());
+	        	children.add(loc, sibling);
 				
 			}
 			
 			//Split if root overflow
+			//Note: This code only runs if this node is the root
 			if (root.isOverflow()) {
 				
-				//Create new temporary root
+				//Split node
 				Node sibling = split();
 				InternalNode newRoot = new InternalNode();
 				
-				//Add children to new root
+				//Promote middle key
 				newRoot.keys.add(sibling.getFirstLeafKey());
 				newRoot.children.add(this);
 				newRoot.children.add(sibling);
@@ -362,19 +353,26 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	
         	//Insert key-value pair into appropriate location
         	int loc = 0;
-        	while(keys.get(loc).compareTo(key) < 0)
+        	while(keys.get(loc).compareTo(key) < 0 && loc < keys.size())
         		loc++;
         	keys.add(loc, key);
         	values.add(loc, value);
+        	//TODO make sure duplicates are handled this way
         	
         	//Deal with possible root overflow
+        	//Note: this code only runs if this node is the root
 			if (root.isOverflow()) {
+				
+				//Split node
 				Node sibling = split();
 				InternalNode newRoot = new InternalNode();
+				
+				//Promote middle key
 				newRoot.keys.add(sibling.getFirstLeafKey());
 				newRoot.children.add(this);
 				newRoot.children.add(sibling);
 				root = newRoot;
+				
 			}
 			
         }
@@ -407,9 +405,9 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	keys.removeAll(keys.subList(start, end));
 
         	//Update pointers
-			sibling.next = next;
+			sibling.next = this.next;
 			sibling.previous = this;
-			next = sibling;
+			this.next = sibling;
 			return sibling;
 			
         }
