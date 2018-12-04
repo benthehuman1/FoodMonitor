@@ -17,6 +17,8 @@ EXAMPLE CONTENTS:
             "DataSetFileName": "whatever.txt",
             "meals": [
                 {
+                		"name" : "Lunch",
+                		"ID" "439f1af6-912f-479b-84ac-04c4d0e04a17",
                     "mealItems" : [
                         {"quantity": 3, "foodID": "439f1af6-912f-479b-84ac-04c4d0e04a17"},
                         {"quantity": 2, "foodID": "c5b075fe-8a45-4e6a-9648-5c6d046a9cc4"}
@@ -27,7 +29,9 @@ EXAMPLE CONTENTS:
         {
             "DataSetFileName": "anotherSet.csv",
             "meals": [
-                {
+                {	
+                		"name" : "Lunch",
+                		"ID" "439f1af6-912f-479b-84ac-04c4d0e04a17",
                     "mealItems" : [
                         {"quantity": 1, "foodID": "439f1af6-912f-479b-84ac-blahblahblah"},
                         {"quantity": 2, "foodID": "c5b075fe-8a45-9972-9648-5c6d046a9cc4"},
@@ -35,6 +39,8 @@ EXAMPLE CONTENTS:
                     ]
                 },
                 {
+                		"name" : "Lunch",
+                		"ID" "439f1af6-912f-479b-84ac-04c4d0e04a17",
                     "mealItems" : [
                         {"quantity": 5, "foodID": "439f1af6-912f-479b-84ac-vlahvlahvlah"}
                     ]

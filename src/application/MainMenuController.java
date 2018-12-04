@@ -3,15 +3,27 @@ package application;
 
 
 import java.awt.Checkbox;
+import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.lang.model.element.VariableElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter.DEFAULT;
 
+import Models.FoodItem;
+import Models.FoodQuery;
+import Models.Meal;
+import Models.MealViewModel;
+import Models.Nutrient;
+import Services.FoodListService;
+import Services.MealListService;
+/*
 import Models.FoodItem;
 import Models.Meal;
 import Services.FoodListService;
 import Services.MealListService;
+*/
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -33,26 +45,55 @@ import javafx.scene.text.Font;
 public class MainMenuController {
 	
 	//Logical Members
+	private static final String DEFAULT_DATASET_PATH = "./Data/FoodDataSets/defaultFoodData.csv";
 	private Main main;
+	
 	FoodListService foodService; 
 	MealListService mealService;
 	
 	//Graphical Members
 	private Label lbl;
+	private ListView<FoodListItem> foodList;
+	private ListView<MealListItem> mealList;
 	
-	//EXAMPLE OF HOW TO PUT "Hidden" DATA IN A LISTVIEW.
-	class SampleData{
-		public String name;
-		public UUID ID;
+		//Meal DetailSection
+		private Label selectedMeal_Name;
+		private VBox selectedMeal_NutrientBarContainer;
+	
+	
+	class FoodListItem{
+		private String foodName;
+		private UUID ID;
 		
-		public SampleData(String name) {
-			this.ID = UUID.randomUUID();
-			this.name = name;
+		public FoodListItem(FoodItem food) {
+			this.foodName = food.getName();
+			this.ID = food.getId();
 		}
 		
 		public String toString() {
-			return this.name;
-			//When we make a list of these, this is what is rendered, but the age is still in the item for later reference. 
+			return this.foodName;
+		}
+		
+		public UUID getFoodID() {
+			return this.ID;
+		}
+	}
+	
+	class MealListItem{
+		private String mealName;
+		private UUID ID;
+		
+		public MealListItem(Meal meal) {
+			this.mealName = meal.getName();
+			this.ID = meal.getID();
+		}
+		
+		public String toString() {
+			return this.mealName;
+		}
+		
+		public UUID getMealID() {
+			return this.ID;
 		}
 	}
 	
@@ -122,16 +163,14 @@ public class MainMenuController {
 		foodList.setPrefHeight(490);
 			
 			//Setup List View: 100% Not final
-			ListView<SampleData> listView = new ListView<SampleData>();
-			listView.setPrefHeight(490);
-			listView.getItems().add(new SampleData("BOI"));
-			listView.getItems().add(new SampleData("BOY"));
-			listView.getItems().add(new SampleData("BOYE"));
+			this.foodList = new ListView<FoodListItem>();
+			this.foodList.setPrefHeight(490);
+			
 		
 			//SelectedItem - We can get the ID out of this. 
-			SampleData sData = listView.getSelectionModel().getSelectedItem();
+			FoodListItem sData = this.foodList.getSelectionModel().getSelectedItem();
 		
-			foodList.setContent(listView);
+			foodList.setContent(this.foodList);
 		
 		
 		Button newFoodButton = new Button();
@@ -156,23 +195,22 @@ public class MainMenuController {
 			refreshButton.setPrefHeight(75);
 			refreshButton.setPrefWidth(100);
 		
-			Label mealNameLabel = new Label();
-			mealNameLabel.setText("Lunch");
-			mealNameLabel.setFont(new Font("System", 60));
-			mealNameLabel.setAlignment(Pos.CENTER);
+			this.selectedMeal_Name = new Label();
+			this.selectedMeal_Name.setFont(new Font("System", 60));
+			this.selectedMeal_Name.setAlignment(Pos.CENTER);
 			
 			mealRefresh_MealName.getChildren().add(refreshButton);
-			mealRefresh_MealName.getChildren().add(mealNameLabel);
+			mealRefresh_MealName.getChildren().add(this.selectedMeal_Name);
 			
 			//Setup nutritionBars
-			VBox nutrientBars = new VBox();
-			nutrientBars.setPrefHeight(200);
+			this.selectedMeal_NutrientBarContainer = new VBox();
+			this.selectedMeal_NutrientBarContainer.setPrefHeight(200);
 			//DATA is temporary
-			nutrientBars.getChildren().add(getMealNutritionBar("Calories", 123, 0.6));
-			nutrientBars.getChildren().add(getMealNutritionBar("Fat Grams", 11, 0.4));
-			nutrientBars.getChildren().add(getMealNutritionBar("Carb Grams", 45, 0.9));
-			nutrientBars.getChildren().add(getMealNutritionBar("Fiber Grams", 64, 0.1));
-			nutrientBars.getChildren().add(getMealNutritionBar("Protein Grams", 90, 0.4));
+			//nutrientBars.getChildren().add(getMealNutritionBar("Calories", 123, 0.6));
+			//nutrientBars.getChildren().add(getMealNutritionBar("Fat Grams", 11, 0.4));
+			//nutrientBars.getChildren().add(getMealNutritionBar("Carb Grams", 45, 0.9));
+			//nutrientBars.getChildren().add(getMealNutritionBar("Fiber Grams", 64, 0.1));
+			//nutrientBars.getChildren().add(getMealNutritionBar("Protein Grams", 90, 0.4));
 			
 			//Setup FoodsLabel
 			Label foodLabel = new Label();
@@ -192,7 +230,7 @@ public class MainMenuController {
 			
 		
 		mealDetailsSection.getChildren().add(mealRefresh_MealName);
-		mealDetailsSection.getChildren().add(nutrientBars);
+		mealDetailsSection.getChildren().add(this.selectedMeal_NutrientBarContainer);
 		mealDetailsSection.getChildren().add(foodLabel);
 		mealDetailsSection.getChildren().add(nutritionTabe);
 		mealDetailsSection.getChildren().add(addFoodToMealButton);
@@ -210,11 +248,9 @@ public class MainMenuController {
 			mealList_Pane.setPrefWidth(250);
 			mealList_Pane.setPrefHeight(640);
 			
-			ListView<String> mealList = new ListView<String>();
+			this.mealList = new ListView<MealListItem>();
 			mealList.setPrefHeight(640);
-			mealList.getItems().add("Beckfast");
-			mealList.getItems().add("Lunch");
-			mealList.getItems().add("Dinner");
+			
 			mealList_Pane.setContent(mealList);
 			
 			Button newMealButton = new Button();
@@ -277,7 +313,7 @@ public class MainMenuController {
 	}
 	
 	//TEMPORARY
-	private HBox getMealNutritionBar(String nutrient, int value, double barVal) {
+	private HBox getMealNutritionBar(String nutrient, double value, double barVal) {
 		HBox hBox = new HBox();
 		hBox.setPrefHeight(35);
 		
@@ -312,6 +348,7 @@ public class MainMenuController {
 		comparator.setPrefWidth(70);
 		comparator.setPrefHeight(30);
 		comparator.getItems().add("");
+		comparator.getItems().add("=");
 		comparator.getItems().add(">=");
 		comparator.getItems().add("<=");
 		
@@ -331,12 +368,15 @@ public class MainMenuController {
 	
 	
 	
-	
-	
 	//Here is where the logic begins.
 	public MainMenuController(BorderPane pageRoot, Main main){
 		this.main = main;
 		initializeElements_Main(pageRoot);
+		this.foodService = new FoodListService();
+		this.foodService.SwitchToNewDataFile(DEFAULT_DATASET_PATH);
+		this.mealService = new MealListService(DEFAULT_DATASET_PATH);
+		
+		LoadDefault();
 	}
 	
 	public void launchNewWindow(String text) {
@@ -350,26 +390,48 @@ public class MainMenuController {
 	public void LoadDefault(){
 		//Loads the three sections of content onto the view, including the FoodItems list (All Items, assumes blank query), the meal info pane. (Empty), and the meal list, with all meals for that particular datafile.
 		//Pre-Conditions: foodservice and mealService have had their data already loaded in and are ready to be queried.
-		// this.LoadDefaultFoodItems();
-		// this.LoadDefaultMealInfoSection();
-		// this.LoadDefaultMealList();
+		this.LoadDefaultFoodItems();
+		Meal firstMeal = this.mealService.GetAllMeals().get(0);
+		MealViewModel firstMealViewModel = this.mealService.getMealViewModelForMealID(firstMeal.getID());
+		this.LoadMealInfoSection(firstMealViewModel);
+		this.LoadDefaultMealList();
+		
 	}
 	public void LoadDefaultFoodItems(){
-		//Queries the foodService to get a FoodsViewModel containing all foods // foodsViewModel vm = foodService.Query(new FoodQuery())
-		//Fills the foodList with the results from that query
-		// this.fillFoodList(vm)
+		ArrayList<FoodListItem> listContents = (ArrayList<FoodListItem>) this.foodService.Query(new FoodQuery())
+				.stream()
+				.map(foodItem -> new FoodListItem(foodItem))
+				.collect(Collectors.toList());
+		this.foodList.getItems().addAll(listContents);
 	}
 	
-	public void LoadDefaultMealInfoSection(){
+	public void LoadMealInfoSection(MealViewModel vm){
 		//Sets the MealInfoSection int the view to blank
+		this.selectedMeal_Name.setText(vm.getMealName());
+		this.selectedMeal_NutrientBarContainer.getChildren().clear();
+		this.selectedMeal_NutrientBarContainer.getChildren().add(getMealNutritionBar("Calories", vm.getNutrientInfo().get(Nutrient.CALORIES), vm.getNutrientBarProgress().get(Nutrient.CALORIES)));
+		this.selectedMeal_NutrientBarContainer.getChildren().add(getMealNutritionBar("Fat Grams", vm.getNutrientInfo().get(Nutrient.FATGRAMS), vm.getNutrientBarProgress().get(Nutrient.FATGRAMS)));
+		this.selectedMeal_NutrientBarContainer.getChildren().add(getMealNutritionBar("Carb Grams", vm.getNutrientInfo().get(Nutrient.CARBGRAMS), vm.getNutrientBarProgress().get(Nutrient.CARBGRAMS)));
+		this.selectedMeal_NutrientBarContainer.getChildren().add(getMealNutritionBar("Fiber Grams", vm.getNutrientInfo().get(Nutrient.FIBERGRAMS), vm.getNutrientBarProgress().get(Nutrient.FIBERGRAMS)));
+		this.selectedMeal_NutrientBarContainer.getChildren().add(getMealNutritionBar("Protein Grams", vm.getNutrientInfo().get(Nutrient.PROTEINGRAMS), vm.getNutrientBarProgress().get(Nutrient.PROTEINGRAMS)));
+		
+		
 	}
 	
 	public void LoadDefaultMealList(){
 		//calls the mealService to get a MealsViewModel containing all meals // MealsViewModel vm = mealService.getAllMeals();
 		//Fills the mealsList view with the results from that call
 		// this.fillMealList(vm);
+		
+		ArrayList<MealListItem> mealListContents = (ArrayList<MealListItem>) this.mealService.GetAllMeals()
+				.stream()
+				.map(meal -> new MealListItem(meal))
+				.collect(Collectors.toList());
+		this.mealList.getItems().addAll(mealListContents);
+		
+		
 	}
-	
+	/*
 	public void fillFoodList(ArrayList<FoodItem> vm){
 		//fills the foodList view with data from the FoodsViewModel
 	}
@@ -377,6 +439,7 @@ public class MainMenuController {
 	public void fillMealList(ArrayList<Meal> vm){
 		//fills the mealsList view with data from the MealsViewModel
 	}
+	*/
 	
 	public void LoadFoodFile(String filePath){
 		//Updates the contents of foodService and mealService to reflect the new data //Loads that data into the view.

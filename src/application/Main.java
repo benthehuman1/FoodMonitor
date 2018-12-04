@@ -1,5 +1,17 @@
 package application;
 	
+import java.util.ArrayList;
+
+import javax.naming.spi.DirStateFactory.Result;
+
+import Models.Comparator;
+import Models.FoodItem;
+import Models.FoodQuery;
+import Models.FoodQueryRule;
+import Models.Nutrient;
+import Repositories.FoodListRepository;
+import Repositories.MealListRepository;
+import Services.FoodListService;
 import javafx.application.Application;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -45,11 +57,13 @@ public class Main extends Application {
 	}
 	
 	public static void main(String[] args) {
+		
 		for(int i = 0; i < 20; i++) {
 			String result = "";
 			result += (99 + (Math.random() * 2.0));
 			System.out.println(result.substring(0, 8));
 		}
+		MealListRepository mealListRepository = new MealListRepository();
 		
 		launch(args);
 	}

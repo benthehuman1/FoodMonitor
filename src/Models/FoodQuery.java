@@ -6,6 +6,11 @@ public class FoodQuery {
 	private String searchTarget;
 	private ArrayList<FoodQueryRule> rules;
 	
+	
+	public FoodQuery() {
+		this.searchTarget = "";
+	}
+	
 	public String getSearchTarget() {
 		return searchTarget;
 	}
