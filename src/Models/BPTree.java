@@ -47,15 +47,6 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         root.insert(key, value);
     }
     
-    /**
-     * Deletes the given key-value pair from the tree
-     * @param key
-     * @param value
-     */
-    public void delete(K key, V value) {
-    	root.delete(key, value);
-    }
-    
     /*
      * (non-Javadoc)
      * @see BPTreeADT#rangeSearch(java.lang.Object, java.lang.String)
@@ -137,14 +128,6 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @param value
          */
         abstract void insert(K key, V value);
-        
-        /**
-         * Deletes the given key-value pair
-         * 
-         * @param key
-         * @param value
-         */
-        abstract void delete(K key, V value);
 
         /**
          * Gets the first leaf key of the tree
@@ -258,14 +241,6 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
 			}
 			
         }
-
-        /**
-         * (non-Javadoc)
-         * @see BPTree.Node#delete(java.lang.Comparable, java.lang.Object)
-         */
-        void delete(K key, V value) {
-        	//TODO
-        }
         
         /**
          * (non-Javadoc)
@@ -375,14 +350,6 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
 				
 			}
 			
-        }
-        
-        /**
-         * (non-Javadoc)
-         * @see BPTree.Node#delete(Comparable, Object)
-         */
-        void delete(K key, V value) {
-        	//TODO
         }
         
         /**
