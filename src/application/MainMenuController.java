@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter.DEFAULT;
 
 import Models.FoodItem;
 import Models.FoodQuery;
+import Models.FoodViewModel;
 import Models.Meal;
 import Models.MealViewModel;
 import Models.Nutrient;
@@ -59,6 +60,7 @@ public class MainMenuController {
 		//Meal DetailSection
 		private Label selectedMeal_Name;
 		private VBox selectedMeal_NutrientBarContainer;
+		private GridPane nutritionTabe;
 	
 	
 	class FoodListItem{
@@ -218,10 +220,10 @@ public class MainMenuController {
 			foodLabel.setFont(new Font("System", 13));
 			
 			//Setup foodNutritionTable
-			GridPane nutritionTabe = new GridPane();
+			this.nutritionTabe = new GridPane();
 			
-			nutritionTabe.addRow(0, getFoodNutritionTableRow("Hot Dogs", new int[] {2, 5, 1, 8, 3, 6}));
-			nutritionTabe.addRow(1, getFoodNutritionTableRow("Tummy Yummy", new int[] {1, 44, 1, 42, 3, 4}));
+			//nutritionTabe.addRow(0, getFoodNutritionTableRow("Hot Dogs", new int[] {2, 5, 1, 8, 3, 6}));
+			//nutritionTabe.addRow(1, getFoodNutritionTableRow("Tummy Yummy", new int[] {1, 44, 1, 42, 3, 4}));
 			
 			//Setup addFoodToMealButton
 			Button addFoodToMealButton = new Button("+ Add Currently Selected Food to Meal");
@@ -269,7 +271,7 @@ public class MainMenuController {
 		pageRoot.setRight(mealSelectionSection);
 	}
 	
-	private GridPane getFoodNutritionTableRow(String food, int[] values/*Length: 6. Temporary*/) {
+	private GridPane getFoodNutritionTableRow(String food, int quantity, double calories, double fatGrams, double carbGrams, double fiberGrams, double proteinGrams) {
 		GridPane row = new GridPane();//400
 		row.setGridLinesVisible(true);
 		row.setPadding(new Insets(5));
@@ -280,35 +282,35 @@ public class MainMenuController {
 		
 		TextField quantitiy = new TextField();
 		quantitiy.setPrefWidth(75);
-		quantitiy.setText("" + values[0]);
+		quantitiy.setText("" + quantity);
 		
-		Label calories = new Label("" + values[1]);
-		calories.setAlignment(Pos.CENTER);
-		calories.setPrefWidth(75);
+		Label caloriesLabel = new Label("" + calories);
+		caloriesLabel.setAlignment(Pos.CENTER);
+		caloriesLabel.setPrefWidth(75);
 		
-		Label fatGrams = new Label("" + values[2]);
-		fatGrams.setPrefWidth(75);
-		fatGrams.setAlignment(Pos.CENTER);
+		Label fatGramsLabel = new Label("" + fatGrams);
+		fatGramsLabel.setPrefWidth(75);
+		fatGramsLabel.setAlignment(Pos.CENTER);
 		
-		Label carbGrams = new Label("" + values[3]);
-		carbGrams.setPrefWidth(75);
-		carbGrams.setAlignment(Pos.CENTER);
+		Label carbGramsLabel = new Label("" + carbGrams);
+		carbGramsLabel.setPrefWidth(75);
+		carbGramsLabel.setAlignment(Pos.CENTER);
 		
-		Label fiberGrams = new Label("" + values[4]);
-		fiberGrams.setPrefWidth(75);
-		fiberGrams.setAlignment(Pos.CENTER);
+		Label fiberGramsLabel = new Label("" + fiberGrams);
+		fiberGramsLabel.setPrefWidth(75);
+		fiberGramsLabel.setAlignment(Pos.CENTER);
 		
-		Label proteinGrams = new Label("" + values[5]);
-		proteinGrams.setPrefWidth(75);
-		proteinGrams.setAlignment(Pos.CENTER);
+		Label proteinGramsLabel = new Label("" + proteinGrams);
+		proteinGramsLabel.setPrefWidth(75);
+		proteinGramsLabel.setAlignment(Pos.CENTER);
 		
 		row.addColumn(0, foodLabel);
 		row.addColumn(1, quantitiy);
-		row.addColumn(2, calories);
-		row.addColumn(3, fatGrams);
-		row.addColumn(4, carbGrams);
-		row.addColumn(5, fiberGrams);
-		row.addColumn(6, proteinGrams);
+		row.addColumn(2, caloriesLabel);
+		row.addColumn(3, fatGramsLabel);
+		row.addColumn(4, carbGramsLabel);
+		row.addColumn(5, fiberGramsLabel);
+		row.addColumn(6, proteinGramsLabel);
 		return row;
 	}
 	
@@ -415,6 +417,10 @@ public class MainMenuController {
 		this.selectedMeal_NutrientBarContainer.getChildren().add(getMealNutritionBar("Fiber Grams", vm.getNutrientInfo().get(Nutrient.FIBERGRAMS), vm.getNutrientBarProgress().get(Nutrient.FIBERGRAMS)));
 		this.selectedMeal_NutrientBarContainer.getChildren().add(getMealNutritionBar("Protein Grams", vm.getNutrientInfo().get(Nutrient.PROTEINGRAMS), vm.getNutrientBarProgress().get(Nutrient.PROTEINGRAMS)));
 		
+		for(int i = 0; i < vm.getFoods().size(); i++) {
+			FoodViewModel foodVM = vm.getFoods().get(i);
+			this.nutritionTabe.addRow(i, getFoodNutritionTableRow(foodVM.getName(), foodVM.getQuantity(), foodVM.getCalories(), foodVM.getFatGrams(), foodVM.getCarboHydrateGrams(), foodVM.getFiberGrams(), foodVM.getProteinGrams()));
+		}
 		
 	}
 	
