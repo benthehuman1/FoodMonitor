@@ -1,12 +1,6 @@
 package Models;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Implementation of a B+ tree to allow efficient access to
@@ -146,6 +140,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         
         /**
          * Deletes the given key-value pair
+         * 
          * @param key
          * @param value
          */
@@ -225,9 +220,58 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#insert(java.lang.Comparable, java.lang.Object)
          */
         void insert(K key, V value) {
-			//TODO
+        	
+        	//Insert into the appropriate child
+        	int loc = 0;
+        	while(keys.get(loc).compareTo(key) < 0)
+        		loc++;
+        	Node child = children.get(loc);
+			child.insert(key, value);
+			
+			//Split if overflow in child
+			if (child.isOverflow()) {
+				
+				//Search for location to insert child based on key
+				Node sibling = child.split();
+				loc = 0;
+	        	while(keys.get(loc).compareTo(sibling.getFirstLeafKey()) < 0)
+	        		loc++;
+	        	
+	        	//TODO fix this
+				
+				//If key is found
+				if (loc >= 0) 
+					children.set(loc + 1, sibling);
+				
+				//Else insert key into list
+				else {
+					keys.add(-loc - 1, key);
+					children.add(-loc, sibling);
+				}
+				
+			}
+			
+			//Split if root overflow
+			if (root.isOverflow()) {
+				
+				//Create new temporary root
+				Node sibling = split();
+				InternalNode newRoot = new InternalNode();
+				
+				//Add children to new root
+				newRoot.keys.add(sibling.getFirstLeafKey());
+				newRoot.children.add(this);
+				newRoot.children.add(sibling);
+				root = newRoot;
+				
+			}
+			
         }
-        
+
+        /**
+         * (non-Javadoc)
+         * @see BPTree.Node#delete(java.lang.Comparable, java.lang.Object)
+         */
         void delete(K key, V value) {
         	//TODO
         }
@@ -237,16 +281,22 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#split()
          */
         Node split() {
+        	
+        	//Creates the right sibling node
         	InternalNode sibling = new InternalNode();
         	int start = keys.size() / 2 + 1;
         	int end = keys.size();
         	
+        	//Add the right half to the sibling
         	sibling.children.addAll(this.children.subList(start, end));
         	sibling.keys.addAll(this.keys.subList(start, end));
         	
+        	//Adds remaining members (removes the right half), note the middle gets promoted
+        	//and is thus not included
         	children.removeAll(children.subList(start - 1, end));
         	keys.removeAll(keys.subList(start - 1, end));
             return sibling;
+            
         }
         
         /**
@@ -309,9 +359,30 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#insert(Comparable, Object)
          */
         void insert(K key, V value) {
-        	//TODO
+        	
+        	//Insert key-value pair into appropriate location
+        	int loc = 0;
+        	while(keys.get(loc).compareTo(key) < 0)
+        		loc++;
+        	keys.add(loc, key);
+        	values.add(loc, value);
+        	
+        	//Deal with possible root overflow
+			if (root.isOverflow()) {
+				Node sibling = split();
+				InternalNode newRoot = new InternalNode();
+				newRoot.keys.add(sibling.getFirstLeafKey());
+				newRoot.children.add(this);
+				newRoot.children.add(sibling);
+				root = newRoot;
+			}
+			
         }
         
+        /**
+         * (non-Javadoc)
+         * @see BPTree.Node#delete(Comparable, Object)
+         */
         void delete(K key, V value) {
         	//TODO
         }
