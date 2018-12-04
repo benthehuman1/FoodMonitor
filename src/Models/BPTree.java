@@ -31,7 +31,6 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
     // for internal nodes of the tree
     private int branchingFactor;
     
-    
     /**
      * Public constructor
      * 
@@ -42,18 +41,26 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             throw new IllegalArgumentException(
                "Illegal branching factor: " + branchingFactor);
         }
-        // TODO : Complete
+        root = new LeafNode();
+        this.branchingFactor = branchingFactor;
     }
-    
     
     /*
      * (non-Javadoc)
      * @see BPTreeADT#insert(java.lang.Object, java.lang.Object)
      */
     public void insert(K key, V value) {
-        // TODO : Complete
+        root.insert(key, value);
     }
     
+    /**
+     * Deletes the given key-value pair from the tree
+     * @param key
+     * @param value
+     */
+    public void delete(K key, V value) {
+    	root.delete(key, value);
+    }
     
     /*
      * (non-Javadoc)
@@ -64,16 +71,22 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             !comparator.contentEquals("==") && 
             !comparator.contentEquals("<=") )
             return new ArrayList<V>();
-        // TODO : Complete
-        return null;
+        return root.rangeSearch(key, comparator);
     }
     
+    /**
+     * Deletes every node in the B+ tree
+     */
+    public void deleteAll() {
+    	root = new LeafNode();
+    }
     
     /*
      * (non-Javadoc)
      * @see java.lang.Object#toString()
      */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public String toString() {
         Queue<List<Node>> queue = new LinkedList<List<Node>>();
         queue.add(Arrays.asList(root));
@@ -104,7 +117,6 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         return sb.toString();
     }
     
-    
     /**
      * This abstract class represents any type of node in the tree
      * This class is a super class of the LeafNode and InternalNode types.
@@ -120,7 +132,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * Package constructor
          */
         Node() {
-            // TODO : Complete
+            keys = new ArrayList<K>();
         }
         
         /**
@@ -131,6 +143,13 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @param value
          */
         abstract void insert(K key, V value);
+        
+        /**
+         * Deletes the given key-value pair
+         * @param key
+         * @param value
+         */
+        abstract void delete(K key, V value);
 
         /**
          * Gets the first leaf key of the tree
@@ -146,7 +165,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          */
         abstract Node split();
         
-        /*
+        /**
          * (non-Javadoc)
          * @see BPTree#rangeSearch(java.lang.Object, java.lang.String)
          */
@@ -182,7 +201,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          */
         InternalNode() {
             super();
-            // TODO : Complete
+            children = new ArrayList<Node>();
         }
         
         /**
@@ -190,8 +209,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#getFirstLeafKey()
          */
         K getFirstLeafKey() {
-            // TODO : Complete
-            return null;
+        	return children.get(0).getFirstLeafKey();
         }
         
         /**
@@ -199,8 +217,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#isOverflow()
          */
         boolean isOverflow() {
-            // TODO : Complete
-            return false;
+            return children.size() > branchingFactor;
         }
         
         /**
@@ -208,7 +225,11 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#insert(java.lang.Comparable, java.lang.Object)
          */
         void insert(K key, V value) {
-            // TODO : Complete
+			//TODO
+        }
+        
+        void delete(K key, V value) {
+        	//TODO
         }
         
         /**
@@ -216,17 +237,25 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#split()
          */
         Node split() {
-            // TODO : Complete
-            return null;
+        	InternalNode sibling = new InternalNode();
+        	int start = keys.size() / 2 + 1;
+        	int end = keys.size();
+        	
+        	sibling.children.addAll(this.children.subList(start, end));
+        	sibling.keys.addAll(this.keys.subList(start, end));
+        	
+        	children.removeAll(children.subList(start - 1, end));
+        	keys.removeAll(keys.subList(start - 1, end));
+            return sibling;
         }
         
         /**
          * (non-Javadoc)
          * @see BPTree.Node#rangeSearch(java.lang.Comparable, java.lang.String)
          */
+        //TODO:throw exception?
         List<V> rangeSearch(K key, String comparator) {
-            // TODO : Complete
-            return null;
+        	return null;
         }
     
     } // End of class InternalNode
@@ -256,17 +285,15 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          */
         LeafNode() {
             super();
-            // TODO : Complete
+            values = new ArrayList<V>();
         }
-        
         
         /**
          * (non-Javadoc)
          * @see BPTree.Node#getFirstLeafKey()
          */
         K getFirstLeafKey() {
-            // TODO : Complete
-            return null;
+            return keys.get(0);
         }
         
         /**
@@ -274,8 +301,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#isOverflow()
          */
         boolean isOverflow() {
-            // TODO : Complete
-            return false;
+        	return values.size() > branchingFactor - 1;
         }
         
         /**
@@ -283,7 +309,11 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#insert(Comparable, Object)
          */
         void insert(K key, V value) {
-            // TODO : Complete
+        	//TODO
+        }
+        
+        void delete(K key, V value) {
+        	//TODO
         }
         
         /**
@@ -291,8 +321,26 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#split()
          */
         Node split() {
-            // TODO : Complete
-            return null;
+        	
+        	//Create the right sibling node
+        	LeafNode sibling = new LeafNode();
+			int start = (keys.size() + 1) / 2;
+			int end = keys.size();
+        	
+			//Add the right half to the sibling
+        	sibling.values.addAll(this.values.subList(start, end));
+        	sibling.keys.addAll(this.keys.subList(start, end));
+        	
+        	//Add remaining members (remove the right half)
+        	values.removeAll(values.subList(start, end));
+        	keys.removeAll(keys.subList(start, end));
+
+        	//Update pointers
+			sibling.next = next;
+			sibling.previous = this;
+			next = sibling;
+			return sibling;
+			
         }
         
         /**
