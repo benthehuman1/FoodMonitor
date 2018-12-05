@@ -11,8 +11,10 @@ import java.util.stream.Collectors;
 import javax.lang.model.element.VariableElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter.DEFAULT;
 
+import Models.Comparator;
 import Models.FoodItem;
 import Models.FoodQuery;
+import Models.FoodQueryRule;
 import Models.Meal;
 import Models.MealViewModel;
 import Models.Nutrient;
@@ -26,6 +28,7 @@ import Services.MealListService;
 */
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -148,6 +151,74 @@ public class MainMenuController {
 			Button searchButton = new Button();
 			searchButton.setPrefWidth(50);
 			searchButton.setText("GO!");
+			
+			//Lambda expression of the search eventHandler
+			searchButton.setOnAction(T -> {
+				
+				int i = 0;
+				FoodQuery query = new FoodQuery();
+				
+				for(Node n : searchOptionsVBox.getChildren()) {
+					Comparator c = null;
+					Nutrient nut = null;
+					double value = -1;
+					
+					if(n instanceof HBox) {
+						for(Node m : ((HBox) n).getChildren()) {		
+					
+							if(m instanceof CheckBox) {
+								if(!((CheckBox) m).isSelected()) {
+									break;
+								}
+								nut = Nutrient.values()[i];
+							}
+							
+							if(m instanceof ComboBox<?>) {
+								String s = ((ComboBox<String>) m).getValue();
+								
+								if(s.equals("<=")) {
+									c = Comparator.LESSTHAN;
+								}
+								else if(s.equals(">=")) {
+									c = Comparator.GREATERTHAN;
+								}
+								else {
+									c = Comparator.EQUALTO;
+								}
+							}
+							
+							if(m instanceof TextField) {
+								try {
+									value = Double.parseDouble(((TextField) m).getText());
+								}
+								catch(Exception e) {
+									value = -1;
+								}
+							}
+							if(c != null && nut != null && value >= 0) {
+								FoodQueryRule f = new FoodQueryRule();
+								f.setComparator(c);
+								f.setNutrient(nut);
+								f.setValue(value);
+								query.getRules().add(f);
+							}
+							
+						}
+						i++;
+					}
+					
+				}
+				
+				query.setSearchTarget(searchBar.getText());
+				
+				ArrayList<FoodListItem> searchedFood = (ArrayList<FoodListItem>) this.foodService.Query(query)
+						.stream()
+						.map(foodItem -> new FoodListItem(foodItem))
+						.collect(Collectors.toList());
+				this.foodList.getItems().clear();
+				this.foodList.getItems().addAll(searchedFood);
+				
+			});
 			
 			searchFieldHBox.getChildren().add(searchBar);
 			searchFieldHBox.getChildren().add(searchButton);
