@@ -47,7 +47,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         root.insert(key, value);
     }
     
-    /*
+    /**
      * (non-Javadoc)
      * @see BPTreeADT#rangeSearch(java.lang.Object, java.lang.String)
      */
@@ -56,7 +56,23 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             !comparator.contentEquals("==") && 
             !comparator.contentEquals("<=") )
             return new ArrayList<V>();
+        if(key == null)
+        	return new ArrayList<V>();
         return root.rangeSearch(key, comparator);
+    }
+    
+    /**
+     * Returns all values that satisfies the range query using the 
+     * given key. Range query should be passed in the form of 
+     * the Comparator enum. 
+     * @param key Key on which to run a query on
+     * @param comparator Comparator enum specifying query
+     * @return List of all values satisfying the query
+     */
+    public List<V> rangeSearch(K key, Comparator comparator) {
+    	if(key == null)
+    		return new ArrayList<V>();
+    	return root.rangeSearch(key, comparator);
     }
     
     /**
@@ -148,6 +164,12 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree#rangeSearch(java.lang.Object, java.lang.String)
          */
         abstract List<V> rangeSearch(K key, String comparator);
+        
+        /**
+         * (non-Javadoc)
+         * @see BPTree#rangeSearch(java.lang.Object, Comparator)
+         */
+        abstract List<V> rangeSearch(K key, Comparator comparator);
 
         /**
          * 
@@ -275,10 +297,23 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * (non-Javadoc)
          * @see BPTree.Node#rangeSearch(java.lang.Comparable, java.lang.String)
          */
-        //TODO:throw exception?
         List<V> rangeSearch(K key, String comparator) {
-        	return null;
+        	int loc = 0;
+        	while(loc < keys.size() && keys.get(loc).compareTo(key) < 0)
+        		loc++;
+        	return children.get(loc).rangeSearch(key, comparator);
         }
+
+        /**
+         * (non-Javadoc)
+         * @see BPTree.Node#rangeSearch(java.lang.Comparable, Comparator)
+         */
+		List<V> rangeSearch(K key, Comparator comparator) {
+        	int loc = 0;
+        	while(loc < keys.size() && keys.get(loc).compareTo(key) < 0)
+        		loc++;
+        	return children.get(loc).rangeSearch(key, comparator);
+		}
     
     } // End of class InternalNode
     
@@ -396,8 +431,52 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          */
         List<V> rangeSearch(K key, String comparator) {
             // TODO : Complete
-            return null;
+        	List<V> ans = new ArrayList<V>();
+        	int loc = 0;
+        	while(loc < keys.size() && keys.get(loc).compareTo(key) < 0)
+        		loc++;
+        	if(keys.get(loc).compareTo(key) != 0)
+        		return ans;
+        	
+        	if(comparator.equals(">=")) {
+        		
+        	}
+        	if(comparator.equals("<=")) {
+        		
+        	}
+			else {
+				
+			}
+        	
+            return ans;
         }
+
+        /**
+         * (non-Javadoc)
+         * @see BPTree.Node#rangeSearch(java.lang.Comparable, Comparator)
+         */
+		List<V> rangeSearch(K key, Comparator comparator) {
+			//TODO
+			List<V> ans = new ArrayList<V>();
+        	int loc = 0;
+        	while(loc < keys.size() && keys.get(loc).compareTo(key) < 0)
+        		loc++;
+        	if(keys.get(loc).compareTo(key) != 0)
+        		return ans;
+        	
+        	if(comparator == Comparator.GREATERTHAN) {
+        		
+        	}
+        	if(comparator == Comparator.LESSTHAN) {
+        		
+        	}
+			else {
+				
+			}
+        	
+            return ans;
+            
+		}
         
     } // End of class LeafNode
     
