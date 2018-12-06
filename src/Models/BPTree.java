@@ -220,7 +220,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
 	        	while(loc < keys.size() && keys.get(loc).compareTo(sibling.getFirstLeafKey()) < 0)
 	        		loc++;
 	        	keys.add(loc, sibling.getFirstLeafKey());
-	        	children.add(loc, sibling);
+	        	children.add(loc + 1, sibling);
 				
 			}
 			
@@ -247,20 +247,26 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#split()
          */
         Node split() {
+
+//        	System.out.println("\n*****Split*****");
+//        	System.out.println(keys + " size: " + keys.size());
         	
         	//Creates the right sibling node
         	InternalNode sibling = new InternalNode();
         	int start = keys.size() / 2 + 1;
-        	int end = keys.size();
         	
         	//Add the right half to the sibling
-        	sibling.children.addAll(this.children.subList(start, end));
-        	sibling.keys.addAll(this.keys.subList(start, end));
+        	sibling.children.addAll(this.children.subList(start, children.size()));
+        	sibling.keys.addAll(this.keys.subList(start, keys.size()));
         	
         	//Adds remaining members (removes the right half), note the middle gets promoted
         	//and is thus not included
-        	children.removeAll(children.subList(start - 1, end));
-        	keys.removeAll(keys.subList(start - 1, end));
+        	children = children.subList(0, start);
+        	keys = keys.subList(0, start);
+			
+//			System.out.println(keys + " " + sibling.keys);
+//			System.out.println("***************");
+			
             return sibling;
             
         }
@@ -357,29 +363,28 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          */
         Node split() {
         	
-        	System.out.println("\n*****Split*****");
-        	System.out.println(keys + " size: " + keys.size());
+//        	System.out.println("\n*****Split*****");
+//        	System.out.println(keys + " size: " + keys.size());
         	
         	//Create the right sibling node
         	LeafNode sibling = new LeafNode();
 			int start = keys.size() / 2;
-			int end = keys.size();
         	
 			//Add the right half to the sibling
-        	sibling.values.addAll(this.values.subList(start, end));
-        	sibling.keys.addAll(this.keys.subList(start, end));
+        	sibling.values.addAll(this.values.subList(start, values.size()));
+        	sibling.keys.addAll(this.keys.subList(start, keys.size()));
         	
         	//Add remaining members (remove the right half)
-        	values.removeAll(values.subList(start, end));
-        	keys.removeAll(keys.subList(start, end));
+        	values = values.subList(0, start);
+        	keys = keys.subList(0, start);
 
         	//Update pointers
 			sibling.next = this.next;
 			sibling.previous = this;
 			this.next = sibling;
 			
-			System.out.println(keys + " " + sibling.keys);
-			System.out.println("***************");
+//			System.out.println(keys + " " + sibling.keys);
+//			System.out.println("***************");
 			
 			return sibling;
 			
@@ -423,7 +428,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         List<Double> list = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             Double j = dd[rnd1.nextInt(4)];
-            System.out.println("Inserting " + j + "...");
+            System.out.println((i + 1) + ": Inserting " + j + "...");
             list.add(j);
             bpTree.insert(j, j);
             System.out.println("\n\nTree structure:\n" + bpTree.toString());
