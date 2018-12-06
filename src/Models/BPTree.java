@@ -206,7 +206,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	
         	//Insert into the appropriate child
         	int loc = 0;
-        	while(keys.get(loc).compareTo(key) < 0 && loc < keys.size())
+        	while(loc < keys.size() && keys.get(loc).compareTo(key) < 0)
         		loc++;
         	Node child = children.get(loc);
 			child.insert(key, value);
@@ -217,7 +217,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
 				//Search for location to insert child based on sibling's first key
 				Node sibling = child.split();
 				loc = 0;
-	        	while(keys.get(loc).compareTo(sibling.getFirstLeafKey()) < 0)
+	        	while(loc < keys.size() && keys.get(loc).compareTo(sibling.getFirstLeafKey()) < 0)
 	        		loc++;
 	        	keys.add(loc, sibling.getFirstLeafKey());
 	        	children.add(loc, sibling);
@@ -328,11 +328,10 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	
         	//Insert key-value pair into appropriate location
         	int loc = 0;
-        	while(keys.get(loc).compareTo(key) < 0 && loc < keys.size())
+        	while(loc < keys.size() && keys.get(loc).compareTo(key) < 0)
         		loc++;
         	keys.add(loc, key);
         	values.add(loc, value);
-        	//TODO make sure duplicates are handled this way
         	
         	//Deal with possible root overflow
         	//Note: this code only runs if this node is the root
@@ -358,9 +357,12 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          */
         Node split() {
         	
+        	System.out.println("\n*****Split*****");
+        	System.out.println(keys + " size: " + keys.size());
+        	
         	//Create the right sibling node
         	LeafNode sibling = new LeafNode();
-			int start = (keys.size() + 1) / 2;
+			int start = keys.size() / 2;
 			int end = keys.size();
         	
 			//Add the right half to the sibling
@@ -375,6 +377,10 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
 			sibling.next = this.next;
 			sibling.previous = this;
 			this.next = sibling;
+			
+			System.out.println(keys + " " + sibling.keys);
+			System.out.println("***************");
+			
 			return sibling;
 			
         }
@@ -415,14 +421,16 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         // just that it functions as a data structure with
         // insert, rangeSearch, and toString() working.
         List<Double> list = new ArrayList<>();
-        for (int i = 0; i < 400; i++) {
+        for (int i = 0; i < 10; i++) {
             Double j = dd[rnd1.nextInt(4)];
+            System.out.println("Inserting " + j + "...");
             list.add(j);
             bpTree.insert(j, j);
             System.out.println("\n\nTree structure:\n" + bpTree.toString());
+            System.out.println("------------------------------------");
         }
-        List<Double> filteredValues = bpTree.rangeSearch(0.2d, ">=");
-        System.out.println("Filtered values: " + filteredValues.toString());
+//        List<Double> filteredValues = bpTree.rangeSearch(0.2d, ">=");
+//        System.out.println("Filtered values: " + filteredValues.toString());
     }
 
 } // End of class BPTree
