@@ -299,9 +299,22 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          */
         List<V> rangeSearch(K key, String comparator) {
         	int loc = 0;
-        	while(loc < keys.size() && keys.get(loc).compareTo(key) < 0)
-        		loc++;
-        	return children.get(loc).rangeSearch(key, comparator);
+        	if(comparator.equals("<=")) {
+        		
+        		//Locate the last node with equal key
+        		while(loc < keys.size() && keys.get(loc).compareTo(key) <= 0)
+	        		loc++;
+	        	return children.get(loc).rangeSearch(key, comparator);
+	        	
+        	}
+        	else {
+        		
+        		//Locate the first node with equal key
+	        	while(loc < keys.size() && keys.get(loc).compareTo(key) < 0)
+	        		loc++;
+	        	return children.get(loc).rangeSearch(key, comparator);
+	        	
+        	}
         }
 
         /**
@@ -436,71 +449,46 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
 
         	List<V> ans = new ArrayList<V>();
         	int loc = 0;
+        	LeafNode cur = this;
         	
-        	//Attempt to locate key (loc will be the index of the key if found)
-        	while(loc < keys.size() && keys.get(loc).compareTo(key) < 0)
-        		loc++;
-        	//TODO fix
-//        	System.out.println("Searching on " + keys);
-//        	if(loc == keys.size() || keys.get(loc).compareTo(key) != 0)
-//        		return ans;
-        	
-        	if(comparator.equals(">=")) {
+        	if(comparator.equals("<=")) {
         		
-        		//Leaf nodes are sorted in increasing order, so add all nodes at and after loc
-        		LeafNode cur = this;
-        		ans.addAll(values.subList(loc, values.size()));
-        		cur = cur.next;
-        		while(cur != null) {
-        			ans.addAll(cur.values);
-        			cur = cur.next;
-        		}
+        		//TODO fix
         		
         	}
         	
-        	else if(comparator.equals("<=")) {
+        	else {
+
+        		//Attempt to find a node equal to key
+            	while(cur.keys.get(loc).compareTo(key) < 0) {
+    				loc++;
+    				if(loc == cur.keys.size() && cur.next != null) {
+    					loc = 0;
+    					cur = cur.next;
+    				}
+    				if(cur.keys.get(loc).compareTo(key) > 0)
+    					return ans;
+    			}
         		
-        		//Locate the last node where key is equal to queried key
-        		LeafNode cur = this;
-				while(loc < cur.keys.size() && cur.keys.get(loc).compareTo(key) == 0) {
-					loc++;
-					if(loc == cur.keys.size() && cur.next != null && cur.next.getFirstLeafKey().compareTo(key) == 0) {
-						loc = 0;
-						cur = cur.next;
-					}
-				}
-				
-				//Add all nodes up to loc
-				ans.addAll(cur.values.subList(0, loc));
-//				System.out.println("Added " + ans);
-				cur = cur.previous;
-				
-				//Since nodes are sorted in increasing order, add all nodes from beginning up to loc
-				while(cur != null) {
-					ans.addAll(cur.values);
-//					System.out.println("Added " + cur.values);
-					cur = cur.previous;
-				}
+            	if(comparator.equals(">=")) {
+            		
+	        		//Leaf nodes are sorted in increasing order, so add all nodes at and after loc
+	        		ans.addAll(cur.values.subList(loc, values.size()));
+	        		cur = cur.next;
+	        		while(cur != null) {
+	        			ans.addAll(cur.values);
+	        			cur = cur.next;
+	        		}
+	        		
+            	}
+            	
+            	else {
+            		
+            		//TODO fix
+            		
+            	}
         		
         	}
-        	
-			else {
-				
-				LeafNode cur = this;
-				System.out.println(cur.keys.get(loc));
-				while(loc < cur.keys.size() && cur.keys.get(loc).compareTo(key) == 0) {
-					ans.add(cur.values.get(loc));
-					loc++;
-					
-					//If the next node still has equal keys, then iterate through next node as well
-					if(loc == cur.keys.size() && cur.next != null && cur.next.getFirstLeafKey().compareTo(key) == 0) {
-						loc = 0;
-						cur = cur.next;
-					}
-					
-				}
-				
-			}
         	
             return ans;
         }
@@ -512,68 +500,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         //TODO override
 		List<V> rangeSearch(K key, Comparator comparator) {
 
-			List<V> ans = new ArrayList<V>();
-        	int loc = 0;
-        	while(loc < keys.size() && keys.get(loc).compareTo(key) < 0)
-        		loc++;
-        	if(keys.get(loc).compareTo(key) != 0)
-        		return ans;
-        	
-        	if(comparator == Comparator.GREATERTHAN) {
-        		
-        		//Leaf nodes are sorted in increasing order, so add all nodes at and after loc
-        		LeafNode cur = this;
-        		ans.addAll(values.subList(loc, values.size()));
-        		cur = cur.next;
-        		while(cur != null) {
-        			ans.addAll(cur.values);
-        			cur = cur.next;
-        		}
-        		
-        	}
-        	
-        	else if(comparator == Comparator.LESSTHAN) {
-        		
-        		//Locate the last node where key is equal to queried key
-        		LeafNode cur = this;
-				while(loc < cur.keys.size() && cur.keys.get(loc).compareTo(key) == 0) {
-					loc++;
-					if(loc == cur.keys.size() && cur.next != null && cur.next.getFirstLeafKey().compareTo(key) == 0) {
-						loc = 0;
-						cur = cur.next;
-					}
-				}
-				
-				//Add all nodes up to loc
-				ans.addAll(cur.values.subList(0, loc));
-				cur = cur.previous;
-				
-				//Since nodes are sorted in increasing order, add all nodes from beginning up to loc
-				while(cur != null) {
-					ans.addAll(cur.values);
-					cur = cur.previous;
-				}
-        		
-        	}
-        	
-			else {
-				
-				LeafNode cur = this;
-				while(loc < cur.keys.size() && cur.keys.get(loc).compareTo(key) == 0) {
-					ans.add(cur.values.get(loc));
-					loc++;
-					
-					//If the next node still has equal keys, then iterate through next node as well
-					if(loc == cur.keys.size() && cur.next != null && cur.next.getFirstLeafKey().compareTo(key) == 0) {
-						loc = 0;
-						cur = cur.next;
-					}
-					
-				}
-				
-			}        	
-
-            return ans;
+			return null;
             
 		}
         
@@ -612,7 +539,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             System.out.println("\n\nTree structure:\n" + bpTree.toString());
             System.out.println("------------------------------------");
         }
-        List<Double> filteredValues = bpTree.rangeSearch(0.5d, "==");
+        List<Double> filteredValues = bpTree.rangeSearch(0.5d, ">=");
         System.out.println("Filtered values: " + filteredValues.toString());
     }
 
