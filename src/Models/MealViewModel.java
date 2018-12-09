@@ -15,7 +15,6 @@ public class MealViewModel {
 	
 	
 	
-	
 	public String getMealName() {
 		return mealName;
 	}
@@ -55,11 +54,11 @@ public class MealViewModel {
 			nutrientInfo.put(Nutrient.PROTEINGRAMS, nutrientInfo.get(Nutrient.PROTEINGRAMS) + vm.getProteinGrams());
 		}
 		
-		nutrientBarProgress.put(Nutrient.CALORIES, nutrientInfo.get(Nutrient.CALORIES) / 440);
-		nutrientBarProgress.put(Nutrient.FATGRAMS, nutrientInfo.get(Nutrient.FATGRAMS) / 23);
-		nutrientBarProgress.put(Nutrient.CARBGRAMS, nutrientInfo.get(Nutrient.CARBGRAMS) / 68);
-		nutrientBarProgress.put(Nutrient.FIBERGRAMS, nutrientInfo.get(Nutrient.FIBERGRAMS) / 14);
-		nutrientBarProgress.put(Nutrient.PROTEINGRAMS, nutrientInfo.get(Nutrient.PROTEINGRAMS) / 40);
+		nutrientBarProgress.put(Nutrient.CALORIES, nutrientInfo.get(Nutrient.CALORIES) / 2000);
+		nutrientBarProgress.put(Nutrient.FATGRAMS, nutrientInfo.get(Nutrient.FATGRAMS) / 65);
+		nutrientBarProgress.put(Nutrient.CARBGRAMS, nutrientInfo.get(Nutrient.CARBGRAMS) / 300);
+		nutrientBarProgress.put(Nutrient.FIBERGRAMS, nutrientInfo.get(Nutrient.FIBERGRAMS) / 25);
+		nutrientBarProgress.put(Nutrient.PROTEINGRAMS, nutrientInfo.get(Nutrient.PROTEINGRAMS) / 50);
 		
 	}
 	

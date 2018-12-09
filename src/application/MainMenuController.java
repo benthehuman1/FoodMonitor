@@ -4,21 +4,25 @@ package application;
 
 import java.awt.Checkbox;
 import java.awt.event.ItemEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.lang.model.element.VariableElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter.DEFAULT;
+import javax.xml.ws.spi.WebServiceFeatureAnnotation;
 
 import Models.FoodItem;
 import Models.FoodQuery;
 import Models.FoodViewModel;
 import Models.Meal;
+import Models.MealItem;
 import Models.MealViewModel;
 import Models.Nutrient;
 import Services.FoodListService;
 import Services.MealListService;
+import javafx.event.EventHandler;
 /*
 import Models.FoodItem;
 import Models.Meal;
@@ -42,22 +46,26 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 public class MainMenuController {
 	
 	//Logical Members
 	private static final String DEFAULT_DATASET_PATH = "./Data/FoodDataSets/defaultFoodData.csv";
 	private Main main;
+	private String currentFoodDataFile;
 	
 	FoodListService foodService; 
 	MealListService mealService;
 	
 	//Graphical Members
-	private Label lbl;
+	private Label dataSetNameLabel;
 	private ListView<FoodListItem> foodList;
 	private ListView<MealListItem> mealList;
 	
 		//Meal DetailSection
+		private VBox mealDetailsSection;
 		private Label selectedMeal_Name;
 		private VBox selectedMeal_NutrientBarContainer;
 		private GridPane nutritionTabe;
@@ -112,9 +120,25 @@ public class MainMenuController {
 		
 		//Setup applicationTitleLabel
 		Label applicationTitleLabel = new Label();
-		applicationTitleLabel.setText("CS-400 Finalz Project");
-		applicationTitleLabel.setFont(new Font("System", 18.0));
-		pageRoot.setAlignment(applicationTitleLabel, Pos.CENTER);
+		//applicationTitleLabel.setText("CS-400 Finalz Project");
+		//applicationTitleLabel.setFont(new Font("System", 18.0));
+		//pageRoot.setAlignment(applicationTitleLabel, Pos.CENTER);
+		
+		HBox pageHeader = new HBox();
+		pageHeader.setPrefHeight(35);
+		
+		Button loadNewDataSetButton = new Button();
+		loadNewDataSetButton.setText("Load New Data Set");
+		
+		loadNewDataSetButton.setOnAction(e -> openFileChooser());
+		
+		
+		this.dataSetNameLabel = new Label();
+		this.dataSetNameLabel.setText("defaultFoodData.csv");
+		
+		pageHeader.getChildren().addAll(loadNewDataSetButton, this.dataSetNameLabel);
+		
+		
 		
 		//Setup foodSection
 		VBox foodSection = new VBox();
@@ -177,6 +201,8 @@ public class MainMenuController {
 		
 		Button newFoodButton = new Button();
 		newFoodButton.setText("+ New Food");
+		newFoodButton.setOnAction(e -> pressAddFood());
+		
 		
 		foodSection.getChildren().add(foodSearchSection);
 		foodSection.getChildren().add(foodList);
@@ -184,8 +210,8 @@ public class MainMenuController {
 		//END foodSection 
 		
 		//Setup Meal Details Section
-		VBox mealDetailsSection = new VBox();
-		mealDetailsSection.setPadding(new Insets(20));
+		this.mealDetailsSection = new VBox();
+		this.mealDetailsSection.setPadding(new Insets(20));
 			
 			// Setup mealRefresh_MealName
 			HBox mealRefresh_MealName = new HBox();
@@ -231,11 +257,11 @@ public class MainMenuController {
 			addFoodToMealButton.setPrefHeight(30);
 			
 		
-		mealDetailsSection.getChildren().add(mealRefresh_MealName);
-		mealDetailsSection.getChildren().add(this.selectedMeal_NutrientBarContainer);
-		mealDetailsSection.getChildren().add(foodLabel);
-		mealDetailsSection.getChildren().add(nutritionTabe);
-		mealDetailsSection.getChildren().add(addFoodToMealButton);
+		this.mealDetailsSection.getChildren().add(mealRefresh_MealName);
+		this.mealDetailsSection.getChildren().add(this.selectedMeal_NutrientBarContainer);
+		this.mealDetailsSection.getChildren().add(foodLabel);
+		this.mealDetailsSection.getChildren().add(nutritionTabe);
+		this.mealDetailsSection.getChildren().add(addFoodToMealButton);
 		//END MealDetailsSection
 		
 		//Setup Meal SelectionSection
@@ -258,6 +284,7 @@ public class MainMenuController {
 			Button newMealButton = new Button();
 			newMealButton.setPrefWidth(250);
 			newMealButton.setText("+ New Meal");
+			newMealButton.setOnAction(e -> pressAddMeal());
 			
 		mealSelectionSection.getChildren().add(mealsLabel);
 		mealSelectionSection.getChildren().add(mealList_Pane);
@@ -265,7 +292,7 @@ public class MainMenuController {
 		
 		
 		
-		pageRoot.setTop(applicationTitleLabel);
+		pageRoot.setTop(pageHeader);
 		pageRoot.setLeft(foodSection);
 		pageRoot.setCenter(mealDetailsSection);
 		pageRoot.setRight(mealSelectionSection);
@@ -366,10 +393,6 @@ public class MainMenuController {
 	}
 	
 	
-	
-	
-	
-	
 	//Here is where the logic begins.
 	public MainMenuController(BorderPane pageRoot, Main main){
 		this.main = main;
@@ -378,25 +401,91 @@ public class MainMenuController {
 		this.foodService.SwitchToNewDataFile(DEFAULT_DATASET_PATH);
 		this.mealService = new MealListService(DEFAULT_DATASET_PATH);
 		
+		this.currentFoodDataFile = DEFAULT_DATASET_PATH;
+		
 		LoadDefault();
 	}
 	
-	public void launchNewWindow(String text) {
-		System.out.println("WHAT DO?");
-		main.showBonusStage(text);
+	public void pressAddFood() {
+		main.showAddFoodItemStage();
+	}
+	
+	
+	public void pressAddMeal() {
+		main.showAddMealStage();
+	}
+	
+	
+	public void addMeal(String mealName) {
+		//{"mealItems":[{"quantity":5,"foodID":"54fe2c2a-4e9d-7e6f-76e3-f56a00000000"}],"name":"Lunch","ID":"1939df07-8aba-4c67-82d0-82c96c1c40d5"}]},
+		Meal result = new Meal();
+		result.setMealItems(new ArrayList<MealItem>());
+		result.setName(mealName);
+		result.setID(UUID.randomUUID());
+		
+		this.mealService.addMeal(result);
+		
+		this.mealList.getItems().add(new MealListItem(result));
+	}
+	
+	public void addFoodItem(FoodItem foodItem) {
+		FoodListItem item = new FoodListItem(foodItem);
+		this.foodList.getItems().add(item);
+		this.foodService.addFoodItem(foodItem);
+	}
+	
+	
+	
+	public void openFileChooser() {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.getExtensionFilters().add(new ExtensionFilter("CSV", "*.csv"));
+		fileChooser.setTitle("Open Resource File");
+		File selectedFile = fileChooser.showOpenDialog(this.main.getMainStage());
+		if(selectedFile == null) { return; }
+		
+		this.dataSetNameLabel.setText(selectedFile.getName());
+		
+		if(selectedFile.getPath().contains("defaultFoodData.csv")) {
+			LoadNewFoodFile(DEFAULT_DATASET_PATH);
+			return;
+		}
+		this.currentFoodDataFile = selectedFile.getPath();
+		
+		//Handle MealLists
+		this.mealService.addNewFoodFile(selectedFile.getPath());
+		 
+		
+		LoadNewFoodFile(selectedFile.getPath());
 		
 	}
 	
+	public void LoadNewFoodFile(String foodDataFilePath) {
+		this.foodService.SwitchToNewDataFile(foodDataFilePath);
+		
+		this.mealService.UpdateToNewDataFile(foodDataFilePath);
+		
+		LoadDefault();
+	}
 	
 	
 	public void LoadDefault(){
 		//Loads the three sections of content onto the view, including the FoodItems list (All Items, assumes blank query), the meal info pane. (Empty), and the meal list, with all meals for that particular datafile.
 		//Pre-Conditions: foodservice and mealService have had their data already loaded in and are ready to be queried.
+		this.foodList.getItems().clear();
+		this.mealList.getItems().clear();
 		this.LoadDefaultFoodItems();
-		Meal firstMeal = this.mealService.GetAllMeals().get(0);
-		MealViewModel firstMealViewModel = this.mealService.getMealViewModelForMealID(firstMeal.getID());
-		this.LoadMealInfoSection(firstMealViewModel);
-		this.LoadDefaultMealList();
+		if(this.mealService.GetAllMeals() == null || this.mealService.GetAllMeals().isEmpty()) {
+			this.mealDetailsSection.setVisible(false);
+			
+		}
+		else {
+			this.mealDetailsSection.setVisible(true);
+			Meal firstMeal = this.mealService.GetAllMeals().get(0);
+			MealViewModel firstMealViewModel = this.mealService.getMealViewModelForMealID(firstMeal.getID());
+			this.LoadMealInfoSection(firstMealViewModel);
+			this.LoadDefaultMealList();
+		}
+		
 		
 	}
 	public void LoadDefaultFoodItems(){
@@ -409,6 +498,8 @@ public class MainMenuController {
 	
 	public void LoadMealInfoSection(MealViewModel vm){
 		//Sets the MealInfoSection int the view to blank
+		this.mealDetailsSection.setDisable(false);
+		
 		this.selectedMeal_Name.setText(vm.getMealName());
 		this.selectedMeal_NutrientBarContainer.getChildren().clear();
 		this.selectedMeal_NutrientBarContainer.getChildren().add(getMealNutritionBar("Calories", vm.getNutrientInfo().get(Nutrient.CALORIES), vm.getNutrientBarProgress().get(Nutrient.CALORIES)));
@@ -417,18 +508,22 @@ public class MainMenuController {
 		this.selectedMeal_NutrientBarContainer.getChildren().add(getMealNutritionBar("Fiber Grams", vm.getNutrientInfo().get(Nutrient.FIBERGRAMS), vm.getNutrientBarProgress().get(Nutrient.FIBERGRAMS)));
 		this.selectedMeal_NutrientBarContainer.getChildren().add(getMealNutritionBar("Protein Grams", vm.getNutrientInfo().get(Nutrient.PROTEINGRAMS), vm.getNutrientBarProgress().get(Nutrient.PROTEINGRAMS)));
 		
+		
+		this.nutritionTabe.getChildren().clear();
 		for(int i = 0; i < vm.getFoods().size(); i++) {
 			FoodViewModel foodVM = vm.getFoods().get(i);
 			this.nutritionTabe.addRow(i, getFoodNutritionTableRow(foodVM.getName(), foodVM.getQuantity(), foodVM.getCalories(), foodVM.getFatGrams(), foodVM.getCarboHydrateGrams(), foodVM.getFiberGrams(), foodVM.getProteinGrams()));
 		}
-		
+	}
+	
+	public void LoadEMPTYMealInfoSection() {
+		this.mealDetailsSection.setDisable(true);
 	}
 	
 	public void LoadDefaultMealList(){
 		//calls the mealService to get a MealsViewModel containing all meals // MealsViewModel vm = mealService.getAllMeals();
 		//Fills the mealsList view with the results from that call
 		// this.fillMealList(vm);
-		
 		ArrayList<MealListItem> mealListContents = (ArrayList<MealListItem>) this.mealService.GetAllMeals()
 				.stream()
 				.map(meal -> new MealListItem(meal))

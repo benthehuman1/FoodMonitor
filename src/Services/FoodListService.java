@@ -13,13 +13,13 @@ public class FoodListService {
 	String filePath;
 	//BPTree<UUID, FoodItem> foodList; //This is where ALL the data is stored. Were just querying it.
 	ArrayList<FoodItem> foodList;
-	
+	private FoodListRepository foodListRepository;
 	
 	
 	public void SwitchToNewDataFile(String filePath){
 		//Switches the file this data is based on.
 		//Calls the repository to get the data from that file //Rebuilds the foodList BPTree with the new data.
-		FoodListRepository foodListRepository = new FoodListRepository(filePath);
+		this.foodListRepository = new FoodListRepository(filePath);
 		this.foodList = foodListRepository.getAllFoodItems();
 		
 	}
@@ -61,5 +61,10 @@ public class FoodListService {
 		if(comp == Comparator.EQUALTO) { return value == target; }
 		else if(comp == Comparator.GREATERTHAN) { return value > target; }
 		else { return value < target; }
+	}
+	
+	public void addFoodItem(FoodItem foodItem) {
+		this.foodList.add(foodItem);
+		this.foodListRepository.saveItems();
 	}
 }

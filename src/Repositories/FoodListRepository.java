@@ -4,8 +4,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.stream.Collector;
@@ -16,9 +19,11 @@ import javafx.scene.shape.Line;
 
 public class FoodListRepository {
 	ArrayList<FoodItem> data;
+	String filePath;
 	
 	
 	public FoodListRepository(String filePath){
+		this.filePath = filePath;
 		File inputF = new File(filePath);
 		try {
 			InputStream inputFS = new FileInputStream(inputF);
@@ -53,9 +58,48 @@ public class FoodListRepository {
 	}
 	
 	public ArrayList<FoodItem> getAllFoodItems(){ 
-		//Returns all FoodItems;
-		//TODO: IMPLEMENT
-		
 		return this.data;
+	}
+
+	public void addFoodItem(FoodItem foodItem) {
+		this.saveItems();
+	}
+	
+	
+	private String serializeFoodItem(FoodItem foodItem) {
+		String result = "";
+		String ID = foodItem.getId().toString().replaceAll("-", "").substring(0, 24);
+		String name = foodItem.getName();
+		String calories = "" + foodItem.getCalories();
+		String fatGrams = "" + foodItem.getFatGrams();
+		String carbGrams = "" + foodItem.getCarboHydrateGrams();
+		String fiberGrams = "" + foodItem.getFiberGrams();
+		String proteinGrams = "" + foodItem.getProteinGrams();
+		
+		result += ID + ",";
+		result += name + ",";
+		result += "calories," + calories + ",";
+		result += "fat," + fatGrams + ",";
+		result += "carbohydrate," + carbGrams + ",";
+		result += "fiber," + fiberGrams + ",";
+		result += "protein," + proteinGrams;
+		
+		return result;
+	}
+	
+	public void saveItems() {
+		ArrayList<String> result = new ArrayList<String>();
+		for(FoodItem foodItem : this.data) {
+			result.add(serializeFoodItem(foodItem));
+		}
+		
+		try {
+			FileWriter fileWriter;
+			fileWriter = new FileWriter(this.filePath);
+			PrintWriter printWriter = new PrintWriter(fileWriter);
+			result.stream().forEach(line -> printWriter.print(line + "\n"));
+
+		    printWriter.close();
+		} catch (IOException e) { e.printStackTrace(); }
 	}
 }

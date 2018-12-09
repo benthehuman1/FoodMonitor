@@ -6,6 +6,10 @@ public class MealList {
 	ArrayList<Meal> meals;
 	String foodFileName;
 
+	public MealList(String foodFileName) {
+		this.foodFileName = foodFileName;
+	}
+	
 	public ArrayList<Meal> getMeals() {
 		return meals;
 	}

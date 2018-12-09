@@ -24,9 +24,18 @@ public class MealListService {
 		
 	
 	public void UpdateToNewDataFile(String foodListFilePath){
-		this.meals = this.mealListRepository.GetForFoodListPath(foodListFilePath);
+		if(this.mealListRepository.hasDataForFoodFile(foodListFilePath)) {
+			this.meals = this.mealListRepository.GetForFoodListPath(foodListFilePath);
+		}
 		this.foodListFilePath = foodListFilePath;
 		
+	}
+	
+	public void addMeal(Meal meal) {
+		if(this.meals.getMeals() == null) {this.meals.setMeals(new ArrayList<Meal>());}
+		this.meals.getMeals().add(meal);
+		this.mealListRepository.saveDataFile();
+		//this.mealListRepository.addNewMeal(meal, this.foodListFilePath);
 	}
 	
 	public ArrayList<Meal> GetAllMeals(){
@@ -44,5 +53,17 @@ public class MealListService {
 		ArrayList<FoodItem> mealFoods = foodListService.getFoodsForFoodIds(foodIds);
 		
 		return new MealViewModel(targetMeal, mealFoods);
+	}
+	
+	public boolean hasAnyDataForFoodFile(String foodDataFilePath) {
+		return this.mealListRepository.hasDataForFoodFile(foodDataFilePath);
+	}
+	
+	public void addNewFoodFile(String foodDataFilePath) {
+		//this.mealListRepository.addNewFoodDataFile("Nope");
+		if(!this.hasAnyDataForFoodFile(foodDataFilePath)) {
+			this.mealListRepository.addNewFoodDataFile(foodDataFilePath);
+			this.mealListRepository.saveDataFile();
+		}
 	}
 }
