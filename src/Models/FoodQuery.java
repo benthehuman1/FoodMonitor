@@ -9,6 +9,7 @@ public class FoodQuery {
 	
 	public FoodQuery() {
 		this.searchTarget = "";
+		this.rules = new ArrayList<FoodQueryRule>();
 	}
 	
 	public String getSearchTarget() {

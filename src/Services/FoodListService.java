@@ -38,7 +38,7 @@ public class FoodListService {
 				stream = stream.filter(food -> foodItemMatchesFoodQueryRule(food, rule));
 			}
 		}
-		if(queryInfo.getSearchTarget() != "") { stream = stream.filter(food -> food.getName().contains(queryInfo.getSearchTarget()));}
+		if(queryInfo.getSearchTarget() != "") { stream = stream.filter(food -> food.getName().toLowerCase().contains(queryInfo.getSearchTarget().toLowerCase()));}
 		
 		return (ArrayList<FoodItem>)stream.collect(Collectors.toList());
 	}
