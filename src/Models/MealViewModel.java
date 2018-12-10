@@ -12,9 +12,14 @@ public class MealViewModel {
 	private HashMap<Nutrient, Double> nutrientInfo; //Maping the nutrient to the nutient value totals
 	private HashMap<Nutrient, Double> nutrientBarProgress; //Maping the nutrient to the proper value of the nutrient bar
 	private ArrayList<FoodViewModel> foods;
+	private UUID ID;
 	
 	
 	
+	public UUID getID() {
+		return ID;
+	}
+
 	public String getMealName() {
 		return mealName;
 	}
@@ -32,6 +37,7 @@ public class MealViewModel {
 	}
 
 	public MealViewModel(Meal meal, ArrayList<FoodItem> foods) {
+		this.ID = meal.getID();
 		this.foods = new ArrayList<FoodViewModel>();
 		this.nutrientInfo = getZeroedOutNutrientMapper();
 		this.nutrientBarProgress = getZeroedOutNutrientMapper();
@@ -43,8 +49,6 @@ public class MealViewModel {
 		for(MealItem item : meal.getMealItems()) {
 			this.foods.add(new FoodViewModel(foodMapper.get(item.getFood()), item.getQuantity()));
 		}
-		
-		
 		
 		for(FoodViewModel vm : this.foods) {
 			nutrientInfo.put(Nutrient.CALORIES, nutrientInfo.get(Nutrient.CALORIES) + vm.getCalories());

@@ -1,6 +1,8 @@
 package Services;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -36,6 +38,33 @@ public class MealListService {
 		this.meals.getMeals().add(meal);
 		this.mealListRepository.saveDataFile();
 		//this.mealListRepository.addNewMeal(meal, this.foodListFilePath);
+	}
+	
+	public void addFoodToMeal(UUID mealID, UUID foodID) {
+		MealItem mealItem = new MealItem();
+		mealItem.setFood(foodID);
+		mealItem.setQuantity(1);
+		
+		Meal targetMeal = this.meals.getMeals().stream().filter(meal -> meal.getID().equals(mealID)).findFirst().get();
+		//If the food is already in the meal, increment at quantity instead of adding the food again.
+		if(targetMeal.getMealItems().stream().anyMatch(item -> item.getFood().equals(foodID))) {
+			MealItem food = targetMeal.getMealItems().stream().filter(item -> item.getFood().equals(foodID)).findFirst().get();
+			food.setQuantity(food.getQuantity() + 1);
+		}
+		else {
+			targetMeal.getMealItems().add(mealItem);			
+		}
+		this.mealListRepository.saveDataFile();
+	}
+	
+	public void updateMealItemQuantities(UUID mealID, HashMap<UUID, Integer> quantityMap) {
+		Meal targetMeal = this.meals.getMeals().stream().filter(meal -> meal.getID().equals(mealID)).findFirst().get();
+		for(MealItem mealItem : targetMeal.getMealItems()) {
+			int qt = quantityMap.get(mealItem.getFood());
+			mealItem.setQuantity(qt);
+		}
+		
+		this.mealListRepository.saveDataFile();
 	}
 	
 	public ArrayList<Meal> GetAllMeals(){

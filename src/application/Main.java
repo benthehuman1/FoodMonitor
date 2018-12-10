@@ -160,7 +160,7 @@ public class Main extends Application {
 		addDialog.close();
 	}
 	
-	private double getDoubleValueFromLabel(TextField field) {
+	public static double getDoubleValueFromLabel(TextField field) {
 		String text = field.getText();
 		if(text.isEmpty() || !isValidDoubleString(text)) { return 0.0; }
 		else {
@@ -168,8 +168,7 @@ public class Main extends Application {
 		}
 	}
 	
-	private boolean isValidDoubleString(String input) {
-		//char[] validChars = {'.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+	public static boolean isValidDoubleString(String input) {
 		String validChars = ".0123456789";
 		for(char c : input.toCharArray()) {
 			if(!validChars.contains("" + c )) { return false; }
