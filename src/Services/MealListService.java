@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import Models.*;
@@ -57,6 +58,19 @@ public class MealListService {
 		this.mealListRepository.saveDataFile();
 	}
 	
+	public void removeFoodFromMeal(UUID mealID, UUID foodID) {
+		Meal targetMeal = this.meals.getMeals().stream().filter(meal -> meal.getID().equals(mealID)).findFirst().get();
+		
+		if(targetMeal.getMealItems().stream().anyMatch(item -> item.getFood().equals(foodID))) {
+			ArrayList<MealItem> newMealItems = (ArrayList<MealItem>) targetMeal.getMealItems().stream()
+					.filter(item -> !item.getFood().equals(foodID))
+					.collect(Collectors.toList());
+			targetMeal.setMealItems(newMealItems);
+		}
+		
+		this.mealListRepository.saveDataFile();
+	}
+	
 	public void updateMealItemQuantities(UUID mealID, HashMap<UUID, Integer> quantityMap) {
 		Meal targetMeal = this.meals.getMeals().stream().filter(meal -> meal.getID().equals(mealID)).findFirst().get();
 		for(MealItem mealItem : targetMeal.getMealItems()) {
@@ -74,9 +88,6 @@ public class MealListService {
 	public MealViewModel getMealViewModelForMealID(UUID mealID) {
 		FoodListService foodListService = new FoodListService();
 		foodListService.SwitchToNewDataFile(foodListFilePath);
-		
-		
-		
 		Meal targetMeal = this.meals.getMeals().stream().filter(meal -> meal.getID().equals(mealID)).findFirst().get();
 		ArrayList<UUID> foodIds = (ArrayList<UUID>) targetMeal.getMealItems().stream().map(mealItem -> mealItem.getFood()).collect(Collectors.toList());
 		ArrayList<FoodItem> mealFoods = foodListService.getFoodsForFoodIds(foodIds);

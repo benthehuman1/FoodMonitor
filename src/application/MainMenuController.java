@@ -399,7 +399,7 @@ public class MainMenuController {
 		fatGramsLabel.setAlignment(Pos.CENTER);
 		
 		Label carbGramsLabel = new Label("" + carbGrams);
-		carbGramsLabel.setPrefWidth(100);
+		carbGramsLabel.setPrefWidth(90);
 		carbGramsLabel.setAlignment(Pos.CENTER);
 		
 		Label fiberGramsLabel = new Label("" + fiberGrams);
@@ -410,6 +410,12 @@ public class MainMenuController {
 		proteinGramsLabel.setPrefWidth(90);
 		proteinGramsLabel.setAlignment(Pos.CENTER);
 		
+		Button removeFoodButton = new Button();
+		removeFoodButton.setPrefWidth(10);
+		removeFoodButton.setText("X");
+		removeFoodButton.setOnAction(e -> pressRemoveFoodFromMeal(foodID));
+		
+		
 		row.addColumn(0, foodLabel);
 		row.addColumn(1, quantitiy);
 		row.addColumn(2, caloriesLabel);
@@ -417,6 +423,7 @@ public class MainMenuController {
 		row.addColumn(4, carbGramsLabel);
 		row.addColumn(5, fiberGramsLabel);
 		row.addColumn(6, proteinGramsLabel);
+		row.addColumn(7, removeFoodButton);
 		return row;
 	}
 	
@@ -443,8 +450,8 @@ public class MainMenuController {
 		fatGramsLabel.setPrefWidth(90);
 		fatGramsLabel.setAlignment(Pos.CENTER);
 		
-		Label carbGramsLabel = new Label("Carbohydrate Grams");
-		carbGramsLabel.setPrefWidth(100);
+		Label carbGramsLabel = new Label("Carb Grams");
+		carbGramsLabel.setPrefWidth(90);
 		carbGramsLabel.setAlignment(Pos.CENTER);
 		
 		Label fiberGramsLabel = new Label("Fiber Grams");
@@ -561,6 +568,12 @@ public class MainMenuController {
 		if(foodListItem == null) { return; }
 		this.mealService.addFoodToMeal(mealViewModel.getID(), foodListItem.ID);
 		MealViewModel firstMealViewModel = this.mealService.getMealViewModelForMealID(mealViewModel.getID());
+		this.LoadMealInfoSection(firstMealViewModel);
+	}
+	
+	public void pressRemoveFoodFromMeal(UUID foodID) {
+		this.mealService.removeFoodFromMeal(this.currentViewedMeal.getID(), foodID);
+		MealViewModel firstMealViewModel = this.mealService.getMealViewModelForMealID(this.currentViewedMeal.getID());
 		this.LoadMealInfoSection(firstMealViewModel);
 	}
 	
@@ -686,7 +699,7 @@ public class MainMenuController {
 		for(int i = 0; i < vm.getFoods().size(); i++) {
 			ArrayList<FoodViewModel> foods = vm.getFoods();
 			FoodViewModel foodVM = foods.get(i);
-			this.nutritionTable.addRow(i + 1, getFoodNutritionTableRow(foodVM.getName(), foodVM.getQuantity(), foodVM.getCalories(), foodVM.getFatGrams(), foodVM.getCarboHydrateGrams(), foodVM.getFiberGrams(), foodVM.getProteinGrams(), foodVM.getID()));
+			this.nutritionTable.addRow(i+ 1, getFoodNutritionTableRow(foodVM.getName(), foodVM.getQuantity(), foodVM.getCalories(), foodVM.getFatGrams(), foodVM.getCarboHydrateGrams(), foodVM.getFiberGrams(), foodVM.getProteinGrams(), foodVM.getID()));
 		}
 	}
 	
