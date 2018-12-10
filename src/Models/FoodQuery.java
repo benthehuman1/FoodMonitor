@@ -3,9 +3,9 @@ package Models;
 import java.util.ArrayList;
 
 public class FoodQuery {
+	
 	private String searchTarget;
 	private ArrayList<FoodQueryRule> rules;
-	
 	
 	public FoodQuery() {
 		this.searchTarget = "";
@@ -24,6 +24,5 @@ public class FoodQuery {
 	public void setRules(ArrayList<FoodQueryRule> rules) {
 		this.rules = rules;
 	}
-	
 	
 }

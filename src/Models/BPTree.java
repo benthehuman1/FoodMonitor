@@ -631,7 +631,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             System.out.println("\n\nTree structure:\n" + bpTree.toString());
             System.out.println("------------------------------------");
         }
-        List<Double> filteredValues = bpTree.rangeSearch(0.9d, "<=");
+        List<Double> filteredValues = bpTree.rangeSearch(0.8d, "<=");
         System.out.println("Filtered values: " + filteredValues.toString());
     }
 

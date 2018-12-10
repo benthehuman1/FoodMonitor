@@ -1,9 +1,11 @@
 package Models;
 
 public class FoodQueryRule {
+	
 	private Nutrient nutrient;
 	private Comparator comparator;
 	private double value;
+	
 	public Nutrient getNutrient() {
 		return nutrient;
 	}
@@ -22,6 +24,5 @@ public class FoodQueryRule {
 	public void setValue(double value) {
 		this.value = value;
 	}
-	
 	
 }
