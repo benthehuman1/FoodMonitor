@@ -9,7 +9,7 @@ import javax.naming.spi.DirStateFactory.Result;
 import org.omg.CosNaming.NamingContextExtPackage.StringNameHelper;
 
 import Models.Comparator;
-import Models.FoodItem;
+import Models.FoodDataItem;
 import Models.FoodQuery;
 import Models.FoodQueryRule;
 import Models.Nutrient;
@@ -51,7 +51,7 @@ public class Main extends Application {
 	
 	
 	public void showAddFoodItemStage() {
-		FoodItem foodItem = new FoodItem();
+		FoodDataItem foodItem = new FoodDataItem();
 		
 		Stage addDialogueStage = new Stage();
 		addDialogueStage.setTitle("Add New FoodItem");
@@ -59,7 +59,7 @@ public class Main extends Application {
 		addDialogueStage.initOwner(primaryStage);
 		
 		BorderPane root = new BorderPane();
-		Scene scene = new Scene(root, 300, 500);
+		Scene scene = new Scene(root, 300, 300);
 		
 		Label mainLabel = new Label("Add New FoodItem");
 		
@@ -73,6 +73,14 @@ public class Main extends Application {
 			TextField foodNameFeild = new TextField();
 			foodNameInputContainer.getChildren().addAll(foodNameLabel, foodNameFeild);
 			inputMap.put("Name", foodNameFeild);
+			
+			HBox foodGivenIDInputContainer = new HBox();
+			foodGivenIDInputContainer.setPadding(new Insets(5));
+			Label foodGivenIDLabel = new Label("ID:");
+			foodGivenIDLabel.setPrefWidth(100);
+			TextField foodGivenIDFeild = new TextField();
+			foodGivenIDInputContainer.getChildren().addAll(foodGivenIDLabel, foodGivenIDFeild);
+			inputMap.put("ID", foodGivenIDFeild);
 			
 			HBox foodCaloriesInputContainer = new HBox();
 			foodCaloriesInputContainer.setPadding(new Insets(5));
@@ -115,6 +123,7 @@ public class Main extends Application {
 			inputMap.put("Protein Grams", foodProteinGramsFeild);
 		
 			inputs.getChildren().add(foodNameInputContainer);
+			inputs.getChildren().add(foodGivenIDInputContainer);
 			inputs.getChildren().add(foodCaloriesInputContainer);
 			inputs.getChildren().add(foodFatGramsInputContainer);
 			inputs.getChildren().add(foodCarbGramsInputContainer);
@@ -145,16 +154,15 @@ public class Main extends Application {
 	
 	
 	private void pressAddFoodButton(HashMap<String, TextField> inputMap, Stage addDialog) {
-		FoodItem foodItem = new FoodItem();
+		FoodDataItem foodItem = new FoodDataItem();
 		foodItem.setName(inputMap.get("Name").getText());
-		foodItem.setId(getRandomGUID_ProperFormat());
+		foodItem.setGivenID(inputMap.get("ID").getText());
+		foodItem.setId(UUID.randomUUID());
 		foodItem.setCalories(getDoubleValueFromLabel(inputMap.get("Calories")));
 		foodItem.setFatGrams(getDoubleValueFromLabel(inputMap.get("Fat Grams")));
 		foodItem.setCarboHydrateGrams(getDoubleValueFromLabel(inputMap.get("Carb Grams")));
 		foodItem.setFiberGrams(getDoubleValueFromLabel(inputMap.get("Fiber Grams")));
 		foodItem.setProteinGrams(getDoubleValueFromLabel(inputMap.get("Protein Grams")));
-		
-		
 		
 		mainPage.addFoodItem(foodItem);
 		addDialog.close();

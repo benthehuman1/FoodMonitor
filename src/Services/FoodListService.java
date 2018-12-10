@@ -12,7 +12,7 @@ import Repositories.FoodListRepository;
 public class FoodListService {
 	String filePath;
 	//BPTree<UUID, FoodItem> foodList; //This is where ALL the data is stored. Were just querying it.
-	ArrayList<FoodItem> foodList;
+	ArrayList<FoodDataItem> foodList;
 	private FoodListRepository foodListRepository;
 	
 	
@@ -24,15 +24,15 @@ public class FoodListService {
 		
 	}
 	
-	public void BuildNewFoodBPTree(ArrayList<FoodItem> data){
+	public void BuildNewFoodBPTree(ArrayList<FoodDataItem> data){
 		//Clears the existing BPTree
 		//Adds all of the items in data to the BPTree, rebuilding it.
 		
 		//UPDATE: Do i actually need this?
 	}
 	
-	public ArrayList<FoodItem> Query(FoodQuery queryInfo){
-		Stream<FoodItem> stream = foodList.stream();
+	public ArrayList<FoodDataItem> Query(FoodQuery queryInfo){
+		Stream<FoodDataItem> stream = foodList.stream();
 		if(queryInfo.getRules() != null) {
 			for(FoodQueryRule rule : queryInfo.getRules()) {
 				stream = stream.filter(food -> foodItemMatchesFoodQueryRule(food, rule));
@@ -40,16 +40,16 @@ public class FoodListService {
 		}
 		if(queryInfo.getSearchTarget() != "") { stream = stream.filter(food -> food.getName().toLowerCase().contains(queryInfo.getSearchTarget().toLowerCase()));}
 		
-		return (ArrayList<FoodItem>)stream.collect(Collectors.toList());
+		return (ArrayList<FoodDataItem>)stream.sorted().collect(Collectors.toList());
 	}
 	
-	public ArrayList<FoodItem> getFoodsForFoodIds(ArrayList<UUID> foodIDs){
-		return (ArrayList<FoodItem>) this.foodList.stream()
+	public ArrayList<FoodDataItem> getFoodsForFoodIds(ArrayList<UUID> foodIDs){
+		return (ArrayList<FoodDataItem>) this.foodList.stream()
 				.filter(item -> foodIDs.contains(item.getId()))
 				.collect(Collectors.toList());
 	}
 	
-	private boolean foodItemMatchesFoodQueryRule(FoodItem food, FoodQueryRule rule) {
+	private boolean foodItemMatchesFoodQueryRule(FoodDataItem food, FoodQueryRule rule) {
 		if(rule.getNutrient() == Nutrient.CALORIES) { return nutrientSatisfiesQueryRule(food.getCalories(), rule.getComparator(), rule.getValue()); }
 		else if(rule.getNutrient() == Nutrient.FATGRAMS) { return nutrientSatisfiesQueryRule(food.getFatGrams(), rule.getComparator(), rule.getValue()); }
 		else if(rule.getNutrient() == Nutrient.CARBGRAMS) { return nutrientSatisfiesQueryRule(food.getCarboHydrateGrams(), rule.getComparator(), rule.getValue()); }
@@ -63,7 +63,7 @@ public class FoodListService {
 		else { return value < target; }
 	}
 	
-	public void addFoodItem(FoodItem foodItem) {
+	public void addFoodItem(FoodDataItem foodItem) {
 		this.foodList.add(foodItem);
 		this.foodListRepository.saveItems();
 	}

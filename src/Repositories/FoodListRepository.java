@@ -1,5 +1,6 @@
 package Repositories;
 
+import java.awt.event.ItemEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,11 +15,11 @@ import java.util.UUID;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import Models.FoodItem;
+import Models.FoodDataItem;
 import javafx.scene.shape.Line;
 
 public class FoodListRepository {
-	ArrayList<FoodItem> data;
+	ArrayList<FoodDataItem> data;
 	String filePath;
 	
 	
@@ -29,19 +30,32 @@ public class FoodListRepository {
 			InputStream inputFS = new FileInputStream(inputF);
 			BufferedReader br = new BufferedReader(new InputStreamReader(inputFS));
 			
-			this.data = (ArrayList<FoodItem>) br.lines()
-				.filter(Line -> Line.equals(",,,,,,,,,,,") == false)
-				.map(Line -> Line.split(","))
-				.map(delimitedLine -> generateFoodItemFromString(delimitedLine))
-				.collect(Collectors.toList());
+			boolean isCleanFile = br.lines().findFirst().get().split(",").length == 12;
+			if(isCleanFile) {
+				this.data = (ArrayList<FoodDataItem>) br.lines()
+						.filter(Line -> Line.equals(",,,,,,,,,,,") == false)
+						.map(Line -> Line.split(","))
+						.map(delimitedLine -> generateFoodItemFromString_Clean(delimitedLine))
+						.collect(Collectors.toList());
+				
+				this.data.stream().forEach(item -> item.setId(UUID.randomUUID()));
+				this.saveItems();
+			}
+			else {
+				this.data = (ArrayList<FoodDataItem>) br.lines()
+						.filter(Line -> Line.equals(",,,,,,,,,,,") == false)
+						.map(Line -> Line.split(","))
+						.map(delimitedLine -> generateFoodItemFromString_Dirty(delimitedLine))
+						.collect(Collectors.toList());
+			}
 			
 		} catch (FileNotFoundException e) { e.printStackTrace(); }
 		
 	}
 	
-	private FoodItem generateFoodItemFromString(String[] delimitedLine) {
-		FoodItem foodItem = new FoodItem();
-		foodItem.setId(getProperUUIDFromGivenID(delimitedLine[0]));
+	private FoodDataItem generateFoodItemFromString_Clean(String[] delimitedLine) {
+		FoodDataItem foodItem = new FoodDataItem();
+		foodItem.setGivenID(delimitedLine[0]);
 		foodItem.setName(delimitedLine[1]);
 		foodItem.setCalories(Double.parseDouble(delimitedLine[3]));
 		foodItem.setFatGrams(Double.parseDouble(delimitedLine[5]));
@@ -52,23 +66,38 @@ public class FoodListRepository {
 		return foodItem;
 	}
 	
+	private FoodDataItem generateFoodItemFromString_Dirty(String[] delimitedLine) {
+		FoodDataItem foodItem = new FoodDataItem();
+		foodItem.setId(UUID.fromString(delimitedLine[0]));
+		foodItem.setGivenID(delimitedLine[1]);
+		foodItem.setName(delimitedLine[2]);
+		foodItem.setCalories(Double.parseDouble(delimitedLine[4]));
+		foodItem.setFatGrams(Double.parseDouble(delimitedLine[6]));
+		foodItem.setCarboHydrateGrams(Double.parseDouble(delimitedLine[8]));
+		foodItem.setFiberGrams(Double.parseDouble(delimitedLine[10]));
+		foodItem.setProteinGrams(Double.parseDouble(delimitedLine[12 ]));
+		
+		return foodItem;
+	}
+	
 	private UUID getProperUUIDFromGivenID(String given) {
 		String formatedGuidString = given.substring(0, 8) + "-" + given.substring(8, 12) + "-" + given.substring(12, 16) + "-" + given.substring(16, 20) + "-" + given.substring(20) + "00000000";
 		return UUID.fromString(formatedGuidString);
 	}
 	
-	public ArrayList<FoodItem> getAllFoodItems(){ 
+	public ArrayList<FoodDataItem> getAllFoodItems(){ 
 		return this.data;
 	}
 
-	public void addFoodItem(FoodItem foodItem) {
+	public void addFoodItem(FoodDataItem foodItem) {
 		this.saveItems();
 	}
 	
 	
-	private String serializeFoodItem(FoodItem foodItem) {
+	private String serializeFoodItem(FoodDataItem foodItem) {
 		String result = "";
-		String ID = foodItem.getId().toString().replaceAll("-", "").substring(0, 24);
+		String ID = foodItem.getId().toString();
+		String givenID = foodItem.getGivenID();
 		String name = foodItem.getName();
 		String calories = "" + foodItem.getCalories();
 		String fatGrams = "" + foodItem.getFatGrams();
@@ -77,6 +106,7 @@ public class FoodListRepository {
 		String proteinGrams = "" + foodItem.getProteinGrams();
 		
 		result += ID + ",";
+		result += givenID + ",";
 		result += name + ",";
 		result += "calories," + calories + ",";
 		result += "fat," + fatGrams + ",";
@@ -89,7 +119,7 @@ public class FoodListRepository {
 	
 	public void saveItems() {
 		ArrayList<String> result = new ArrayList<String>();
-		for(FoodItem foodItem : this.data) {
+		for(FoodDataItem foodItem : this.data) {
 			result.add(serializeFoodItem(foodItem));
 		}
 		

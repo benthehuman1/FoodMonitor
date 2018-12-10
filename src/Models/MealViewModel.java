@@ -36,14 +36,14 @@ public class MealViewModel {
 		return foods;
 	}
 
-	public MealViewModel(Meal meal, ArrayList<FoodItem> foods) {
+	public MealViewModel(Meal meal, ArrayList<FoodDataItem> foods) {
 		this.ID = meal.getID();
 		this.foods = new ArrayList<FoodViewModel>();
 		this.nutrientInfo = getZeroedOutNutrientMapper();
 		this.nutrientBarProgress = getZeroedOutNutrientMapper();
 		this.mealName = meal.getName();
 		
-		HashMap<UUID, FoodItem> foodMapper = new HashMap<UUID, FoodItem>();
+		HashMap<UUID, FoodDataItem> foodMapper = new HashMap<UUID, FoodDataItem>();
 		foods.stream().forEach(food -> foodMapper.put(food.getId(), food));
 		
 		for(MealItem item : meal.getMealItems()) {

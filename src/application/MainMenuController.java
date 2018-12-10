@@ -1,26 +1,13 @@
 package application;
 
-
-
-import java.awt.Checkbox;
-import java.awt.event.ItemEvent;
 import java.io.File;
-import java.sql.RowId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.lang.model.element.VariableElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter.DEFAULT;
-import javax.xml.ws.spi.WebServiceFeatureAnnotation;
-
-import org.omg.PortableServer.ThreadPolicyOperations;
-
-import com.sun.media.jfxmedia.events.NewFrameEvent;
-
 import Models.Comparator;
-import Models.FoodItem;
+import Models.FoodDataItem;
 import Models.FoodQuery;
 import Models.FoodViewModel;
 import Models.FoodQueryRule;
@@ -32,25 +19,16 @@ import Models.Nutrient;
 import Services.FoodListService;
 import Services.MealListService;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-/*
-import Models.FoodItem;
-import Models.Meal;
-import Services.FoodListService;
-import Services.MealListService;
-*/
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -78,6 +56,7 @@ public class MainMenuController {
 	private Label dataSetNameLabel;
 	private ListView<FoodListItem> foodList;
 	private ListView<MealListItem> mealList;
+	private Label foodCountLabel;
 	
 		//Meal DetailSection
 		private VBox mealDetailsSection;
@@ -90,7 +69,7 @@ public class MainMenuController {
 		private String foodName;
 		private UUID ID;
 		
-		public FoodListItem(FoodItem food) {
+		public FoodListItem(FoodDataItem food) {
 			this.foodName = food.getName();
 			this.ID = food.getId();
 		}
@@ -124,7 +103,6 @@ public class MainMenuController {
 	
 	/**
 	 * Creates / Sets up the graphical elements of the page. 
-	 * NOTE: As of 11/27/2018 other methods have no way to access graphical items.
 	 * This method is to be called in the constructor, so when you need access to 
 	 * graphical elements, feel free to add an instance variable, and assign it in the method below.
 	 * @param pageRoot
@@ -152,8 +130,6 @@ public class MainMenuController {
 		this.dataSetNameLabel.setText("defaultFoodData.csv");
 		
 		pageHeader.getChildren().addAll(loadNewDataSetButton, this.dataSetNameLabel);
-		
-		
 		
 		//Setup foodSection
 		VBox foodSection = new VBox();
@@ -266,12 +242,9 @@ public class MainMenuController {
 			foodSearchSectionVBox.getChildren().add(searchFieldHBox);
 			foodSearchSection.getChildren().add(foodSearchSectionVBox);
 			
-		
-		
-			
 		//Setup List View: 100% Not final
 		this.foodList = new ListView<FoodListItem>();
-		this.foodList.setPrefHeight(490);
+		this.foodList.setPrefHeight(475);
 		this.foodList.setPrefWidth(250);
 		
 		this.foodList.setOnMouseClicked(e -> pressFoodItem(this.foodList.getSelectionModel().getSelectedItem()));
@@ -282,13 +255,16 @@ public class MainMenuController {
 		
 		
 		Button newFoodButton = new Button();
+		newFoodButton.setPrefWidth(250);
 		newFoodButton.setText("+ New Food");
 		newFoodButton.setOnAction(e -> pressAddFood());
 		
+		this.foodCountLabel = new Label();
 		
 		foodSection.getChildren().add(foodSearchSection);
 		foodSection.getChildren().add(this.foodList);
 		foodSection.getChildren().add(newFoodButton);
+		foodSection.getChildren().add(foodCountLabel);
 		//END foodSection 
 		
 		//Setup Meal Details Section
@@ -323,9 +299,6 @@ public class MainMenuController {
 			//Setup foodNutritionTable
 			this.nutritionTable = new GridPane();
 			this.nutritionTable.setPrefWidth(700);
-			
-			//nutritionTabe.addRow(0, getFoodNutritionTableRow("Hot Dogs", new int[] {2, 5, 1, 8, 3, 6}));
-			//nutritionTabe.addRow(1, getFoodNutritionTableRow("Tummy Yummy", new int[] {1, 44, 1, 42, 3, 4}));
 			
 			//Setup addFoodToMealButton
 			Button addFoodToMealButton = new Button("+ Add Currently Selected Food to Meal");
@@ -389,7 +362,6 @@ public class MainMenuController {
 		quantitiy.setPrefWidth(90);
 		quantitiy.setText("" + quantity);
 		
-		
 		Label caloriesLabel = new Label("" + calories);
 		caloriesLabel.setAlignment(Pos.CENTER);
 		caloriesLabel.setPrefWidth(90);
@@ -437,30 +409,27 @@ public class MainMenuController {
 		
 		Label foodLabel = new Label("FoodName");
 		foodLabel.setPrefWidth(150);
-		foodLabel.setAlignment(Pos.CENTER);
 		
 		Label quantitiy = new Label("Quantity");
-		quantitiy.setPrefWidth(90);
+		quantitiy.setPrefWidth(85);
 		
 		Label caloriesLabel = new Label("Calories");
-		caloriesLabel.setAlignment(Pos.CENTER);
-		caloriesLabel.setPrefWidth(90);
+		caloriesLabel.setPrefWidth(85);
 		
 		Label fatGramsLabel = new Label("Fat Grams");
-		fatGramsLabel.setPrefWidth(90);
-		fatGramsLabel.setAlignment(Pos.CENTER);
+		fatGramsLabel.setPrefWidth(85);
 		
 		Label carbGramsLabel = new Label("Carb Grams");
-		carbGramsLabel.setPrefWidth(90);
-		carbGramsLabel.setAlignment(Pos.CENTER);
+		carbGramsLabel.setPrefWidth(85);
 		
 		Label fiberGramsLabel = new Label("Fiber Grams");
-		fiberGramsLabel.setPrefWidth(90);
-		fiberGramsLabel.setAlignment(Pos.CENTER);
+		fiberGramsLabel.setPrefWidth(85);
 		
 		Label proteinGramsLabel = new Label("Protein Grams");
 		proteinGramsLabel.setPrefWidth(90);
-		proteinGramsLabel.setAlignment(Pos.CENTER);
+		
+		Label empty = new Label(" ");
+		empty.setPrefWidth(10);
 		
 		row.addColumn(0, foodLabel);
 		row.addColumn(1, quantitiy);
@@ -469,10 +438,10 @@ public class MainMenuController {
 		row.addColumn(4, carbGramsLabel);
 		row.addColumn(5, fiberGramsLabel);
 		row.addColumn(6, proteinGramsLabel);
+		row.addColumn(7, empty);
 		return row;
 	}
 	
-	//TEMPORARY
 	private HBox getMealNutritionBar(String nutrient, double value, double barVal, String dailyValue) {
 		HBox hBox = new HBox();
 		hBox.setPrefWidth(700);
@@ -584,8 +553,6 @@ public class MainMenuController {
 		for(int i = 1; i < this.nutritionTable.getChildren().size(); i++) {
 			GridPane actualRow = (GridPane) this.nutritionTable.getChildren().get(i);
 			UUID foodID = (UUID) actualRow.getUserData();
-			ObservableList<Node> children = actualRow.getChildren();
-			Node boi = children.get(2);
 			TextField quantityInput = (TextField) actualRow.getChildren().get(2);
 			Integer quantity = new Integer((int) Main.getDoubleValueFromLabel(quantityInput));
 			quantityMap.put(foodID, quantity);
@@ -612,9 +579,10 @@ public class MainMenuController {
 		}
 	}
 	
-	public void addFoodItem(FoodItem foodItem) {
+	public void addFoodItem(FoodDataItem foodItem) {
 		FoodListItem item = new FoodListItem(foodItem);
 		this.foodList.getItems().add(item);
+		this.foodCountLabel.setText("Food Item Count:" + this.foodList.getItems().size() + " Items");
 		this.foodService.addFoodItem(foodItem);
 	}
 	
@@ -678,6 +646,7 @@ public class MainMenuController {
 				.map(foodItem -> new FoodListItem(foodItem))
 				.collect(Collectors.toList());
 		this.foodList.getItems().addAll(listContents);
+		this.foodCountLabel.setText("Food Item Count:" + this.foodList.getItems().size() + " Items");
 	}
 	
 	public void LoadMealInfoSection(MealViewModel vm){

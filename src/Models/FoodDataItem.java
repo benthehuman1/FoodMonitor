@@ -2,15 +2,30 @@ package Models;
 
 import java.util.UUID;
 
-public class FoodItem {
+import org.omg.CORBA.PUBLIC_MEMBER;
+
+public class FoodDataItem implements Comparable<FoodDataItem> {
 	
 	private UUID id;
+	private String givenID;
 	private String name;
 	private double calories;
 	private double fatGrams;
 	private double carboHydrateGrams;
 	private double fiberGrams;
 	private double proteinGrams;
+	
+	
+	public int compareTo(FoodDataItem other) {
+		return this.name.compareTo(other.name);
+	}
+	
+	public String getGivenID() {
+		return givenID;
+	}
+	public void setGivenID(String givenID) {
+		this.givenID = givenID;
+	}
 	public UUID getId() {
 		return id;
 	}

@@ -14,7 +14,7 @@ public class FoodViewModel {
 	private double fiberGrams;
 	private double proteinGrams;
 	
-	public FoodViewModel(FoodItem food, int quantity) {
+	public FoodViewModel(FoodDataItem food, int quantity) {
 		this.ID = food.getId();
 		this.name = food.getName();
 		this.quantity = quantity;

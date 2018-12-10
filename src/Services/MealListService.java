@@ -90,7 +90,7 @@ public class MealListService {
 		foodListService.SwitchToNewDataFile(foodListFilePath);
 		Meal targetMeal = this.meals.getMeals().stream().filter(meal -> meal.getID().equals(mealID)).findFirst().get();
 		ArrayList<UUID> foodIds = (ArrayList<UUID>) targetMeal.getMealItems().stream().map(mealItem -> mealItem.getFood()).collect(Collectors.toList());
-		ArrayList<FoodItem> mealFoods = foodListService.getFoodsForFoodIds(foodIds);
+		ArrayList<FoodDataItem> mealFoods = foodListService.getFoodsForFoodIds(foodIds);
 		
 		return new MealViewModel(targetMeal, mealFoods);
 	}
