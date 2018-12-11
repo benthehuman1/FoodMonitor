@@ -6,37 +6,18 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import Models.Comparator;
-import Models.FoodDataItem;
-import Models.FoodQuery;
-import Models.FoodViewModel;
-import Models.FoodQueryRule;
-
-import Models.Meal;
-import Models.MealItem;
-import Models.MealViewModel;
-import Models.Nutrient;
-import Services.FoodListService;
-import Services.MealListService;
-import javafx.collections.ObservableList;
+import Models.*;
+import Services.*;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
+import javafx.stage.Screen;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 public class MainMenuController {
@@ -273,9 +254,11 @@ public class MainMenuController {
 		//END foodSection 
 		
 		//Setup Meal Details Section
+		Rectangle2D screen = Screen.getPrimary().getVisualBounds();
 		this.mealDetailsSection = new VBox();
-		this.mealDetailsSection.setPrefWidth(700);
+		this.mealDetailsSection.setPrefWidth(screen.getMaxX() / 8);
 		this.mealDetailsSection.setPadding(new Insets(20));
+		this.mealDetailsSection.setTranslateX(screen.getMaxX() / 7 - this.mealDetailsSection.getWidth());
 			
 			// Setup mealRefresh_MealName
 			HBox mealRefresh_MealName = new HBox();
