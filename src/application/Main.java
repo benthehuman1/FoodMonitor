@@ -22,6 +22,7 @@ public class Main extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) {
+		
 		this.primaryStage = primaryStage;
 		try {
 			
@@ -37,8 +38,8 @@ public class Main extends Application {
 			
 			primaryStage.setX(primaryScreenBounds.getMinX());
 			primaryStage.setY(primaryScreenBounds.getMinY());
-			primaryStage.setWidth(primaryScreenBounds.getWidth());
 			primaryStage.setHeight(primaryScreenBounds.getHeight());
+			primaryStage.resizableProperty().setValue(Boolean.FALSE);
 			primaryStage.setMaximized(true);
 			
 		} catch(Exception e) {
