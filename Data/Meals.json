@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 {"FoodDataSetFiles":[{"dataSetFileName":".\/Data\/FoodDataSets\/defaultFoodData.csv","meals":[{"mealItems":[{"quantity":17,"foodID":"c974a8e7-1aad-4164-a5b6-5ced3d2b463e"},{"quantity":1,"foodID":"6a75a97c-8a25-4479-bac1-c190aac64660"},{"quantity":1,"foodID":"ac47bfe0-fb1b-4c0c-bd72-574820356bb5"},{"quantity":1,"foodID":"c2acc3a2-1c0f-4e50-b75f-fe5b7f5fd3d5"}],"name":"Second Breakfast","ID":"6c483cbc-54db-4e0f-83aa-fd86d4979680"},{"mealItems":[],"name":"Food","ID":"42ca30de-1187-454d-a267-6ff2c65c9466"}]}]}
+=======
+{"FoodDataSetFiles":[{"dataSetFileName":".\/Data\/FoodDataSets\/defaultFoodData.csv","meals":[{"mealItems":[{"quantity":1,"foodID":"f3fc5e23-4bf1-42ce-9880-32b5b76ab2fb"},{"quantity":1,"foodID":"c2acc3a2-1c0f-4e50-b75f-fe5b7f5fd3d5"}],"name":"Second Breakfast","ID":"6c483cbc-54db-4e0f-83aa-fd86d4979680"},{"mealItems":[],"name":"Food","ID":"42ca30de-1187-454d-a267-6ff2c65c9466"}]}]}
+>>>>>>> fcd1fb5b162b214518f2af112d1cd46cd6a6eb36
