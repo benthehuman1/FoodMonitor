@@ -1,22 +1,11 @@
 package Repositories;
 
-import java.awt.event.ItemEvent;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.UUID;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import Models.FoodDataItem;
-import javafx.scene.shape.Line;
 
 public class FoodListRepository {
 	ArrayList<FoodDataItem> data;
@@ -27,6 +16,7 @@ public class FoodListRepository {
 		this.filePath = filePath;
 		File inputF = new File(filePath);
 		try {
+			
 			InputStream inputFS = new FileInputStream(inputF);
 			BufferedReader br = new BufferedReader(new InputStreamReader(inputFS));
 			
@@ -49,7 +39,10 @@ public class FoodListRepository {
 						.collect(Collectors.toList());
 			}
 			
+			br.close();
+			
 		} catch (FileNotFoundException e) { e.printStackTrace(); }
+		catch (IOException e) {e.printStackTrace();}
 		
 	}
 	
@@ -80,6 +73,7 @@ public class FoodListRepository {
 		return foodItem;
 	}
 	
+	@SuppressWarnings("unused")
 	private UUID getProperUUIDFromGivenID(String given) {
 		String formatedGuidString = given.substring(0, 8) + "-" + given.substring(8, 12) + "-" + given.substring(12, 16) + "-" + given.substring(16, 20) + "-" + given.substring(20) + "00000000";
 		return UUID.fromString(formatedGuidString);

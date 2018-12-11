@@ -606,7 +606,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
      */
     public static void main(String[] args) {
         // create empty BPTree with branching factor of 3
-        BPTree<Double, Double> bpTree = new BPTree<>(3);
+        BPTree<Double, Double> bpTree = new BPTree<>(10);
 
         // create a pseudo random number generator
         Random rnd1 = new Random();
@@ -621,7 +621,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         // just that it functions as a data structure with
         // insert, rangeSearch, and toString() working.
         List<Double> list = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             Double j = dd[rnd1.nextInt(4)];
             System.out.println((i + 1) + ": Inserting " + j + "...");
             list.add(j);
@@ -630,6 +630,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             System.out.println("------------------------------------");
         }
         List<Double> filteredValues = bpTree.rangeSearch(0.5d, "<=");
+        Collections.sort(filteredValues);
         System.out.println("Filtered values: " + filteredValues.toString());
     }
 

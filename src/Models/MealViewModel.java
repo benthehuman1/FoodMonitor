@@ -1,11 +1,8 @@
 package Models;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
-
-import javafx.util.Pair;
 
 public class MealViewModel {
 	private String mealName;
