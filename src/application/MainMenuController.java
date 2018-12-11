@@ -281,19 +281,11 @@ public class MainMenuController {
 			HBox mealRefresh_MealName = new HBox();
 			mealRefresh_MealName.setPrefHeight(100);
 		
-			Button refreshButton = new Button();
-			refreshButton.setText("Refresh");
-			refreshButton.setFont(new Font("System", 19));
-			refreshButton.setPrefHeight(75);
-			refreshButton.setPrefWidth(100);
-			
-			refreshButton.setOnAction(e -> pressRefreshMealDetailsSection());
 		
 			this.selectedMeal_Name = new Label();
 			this.selectedMeal_Name.setFont(new Font("System", 60));
 			this.selectedMeal_Name.setAlignment(Pos.CENTER);
 			
-			mealRefresh_MealName.getChildren().add(refreshButton);
 			mealRefresh_MealName.getChildren().add(this.selectedMeal_Name);
 			
 			//Setup nutritionBars
@@ -309,7 +301,8 @@ public class MainMenuController {
 			Button addFoodToMealButton = new Button("+ Add Currently Selected Food to Meal");
 			addFoodToMealButton.setPrefWidth(700);
 			addFoodToMealButton.setPrefHeight(30);
-			addFoodToMealButton.setOnAction(e -> pressAddSelectedFoodToMeal());
+			addFoodToMealButton.setOnAction(e -> {pressRefreshMealDetailsSection();
+			pressAddSelectedFoodToMeal();});
 			
 		
 		this.mealDetailsSection.getChildren().add(mealRefresh_MealName);
@@ -366,6 +359,9 @@ public class MainMenuController {
 		TextField quantitiy = new TextField();
 		quantitiy.setPrefWidth(90);
 		quantitiy.setText("" + quantity);
+		
+		quantitiy.setOnAction(e ->	pressRefreshMealDetailsSection());
+		
 		
 		Label caloriesLabel = new Label("" + calories);
 		caloriesLabel.setAlignment(Pos.CENTER);
