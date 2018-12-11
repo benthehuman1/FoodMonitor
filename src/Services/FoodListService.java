@@ -1,7 +1,5 @@
 package Services;
 
-import java.awt.event.ItemEvent;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -10,24 +8,26 @@ import Models.*;
 import Repositories.FoodListRepository;
 
 public class FoodListService {
+	
 	String filePath;
 	//This is where ALL the data is stored. We're just querying it.
 	BPTree<Double, FoodDataItem> fiber;
 	BPTree<Double, FoodDataItem> fat; 
 	BPTree<Double, FoodDataItem> carbs; 
 	BPTree<Double, FoodDataItem> calories; 
-	BPTree<Double, FoodDataItem> protein; 
+	BPTree<Double, FoodDataItem> protein;
 	private static final int BRANCHINGFACTOR = 3;
 	
 	ArrayList<FoodDataItem> foodList;
 	private FoodListRepository foodListRepository;
 	
-	
 	public void SwitchToNewDataFile(String filePath){
+		
 		//Switches the file this data is based on.
 		//Calls the repository to get the data from that file //Rebuilds the foodList BPTree with the new data.
 		this.foodListRepository = new FoodListRepository(filePath);
 		this.foodList = foodListRepository.getAllFoodItems();
+		BuildNewFoodBPTree(foodList);
 		
 	}
 	
@@ -58,42 +58,55 @@ public class FoodListService {
 	 * @param queryInfo
 	 * @return Results of the query
 	 */
-	public List<FoodDataItem> Query(FoodQuery queryInfo) {
+	public ArrayList<FoodDataItem> Query(FoodQuery queryInfo) {
 		
 		Stream<FoodDataItem> stream = foodList.stream();
+		
 		if(queryInfo.getRules() != null) {
 			for(FoodQueryRule rule : queryInfo.getRules()) {
-				stream = stream.filter(food -> foodItemMatchesFoodQueryRule(food, rule));
+				
+				//Runs a range search using the B+ Tree to get all foods satisfying the query
+				//then filters the complete food list using the result of range search
+				List<FoodDataItem> result;
+				switch(rule.getNutrient()) {
+					case PROTEINGRAMS:
+						result = protein.rangeSearch(rule.getValue(), rule.getComparator());
+						break;
+					case FATGRAMS:
+						result = fat.rangeSearch(rule.getValue(), rule.getComparator());
+						break;
+					case CARBGRAMS:
+						result = carbs.rangeSearch(rule.getValue(), rule.getComparator());
+						break;
+					case FIBERGRAMS:
+						result = fiber.rangeSearch(rule.getValue(), rule.getComparator());
+						break;
+					default:
+						result = calories.rangeSearch(rule.getValue(), rule.getComparator());
+						break;
+				}
+				stream = stream.filter(food -> result.contains(food));
+				
 			}
 		}
-		//TODO: What is the point of search target
-		if(queryInfo.getSearchTarget() != "") { stream = stream.filter(food -> food.getName().toLowerCase().contains(queryInfo.getSearchTarget().toLowerCase()));}
-		return stream.sorted().collect(Collectors.toList());
+		
+		//Filter foods based on a search string
+		if(queryInfo.getSearchTarget() != "")
+			stream = stream.filter(food -> food.getName().toLowerCase().contains(queryInfo.getSearchTarget().toLowerCase()));
+		
+		return (ArrayList<FoodDataItem>) stream.sorted().collect(Collectors.toList());
 		
 	}
 	
-	private boolean verifyContains(List<FoodDataItem> ... items) {
-		return false;
-	}
-	
+	/**
+	 * Search for foods given a list of ID numbers
+	 * @param foodIDs List of UUIDs to look for
+	 * @return List of located foods
+	 */
 	public ArrayList<FoodDataItem> getFoodsForFoodIds(ArrayList<UUID> foodIDs){
 		return (ArrayList<FoodDataItem>) this.foodList.stream()
 				.filter(item -> foodIDs.contains(item.getId()))
 				.collect(Collectors.toList());
-	}
-	
-	private boolean foodItemMatchesFoodQueryRule(FoodDataItem food, FoodQueryRule rule) {
-		if(rule.getNutrient() == Nutrient.CALORIES) { return nutrientSatisfiesQueryRule(food.getCalories(), rule.getComparator(), rule.getValue()); }
-		else if(rule.getNutrient() == Nutrient.FATGRAMS) { return nutrientSatisfiesQueryRule(food.getFatGrams(), rule.getComparator(), rule.getValue()); }
-		else if(rule.getNutrient() == Nutrient.CARBGRAMS) { return nutrientSatisfiesQueryRule(food.getCarboHydrateGrams(), rule.getComparator(), rule.getValue()); }
-		else if(rule.getNutrient() == Nutrient.FIBERGRAMS) { return nutrientSatisfiesQueryRule(food.getFiberGrams(), rule.getComparator(), rule.getValue()); }
-		else { return nutrientSatisfiesQueryRule(food.getProteinGrams(), rule.getComparator(), rule.getValue()); }
-	}
-	
-	private boolean nutrientSatisfiesQueryRule(double value, Comparator comp, double target) {
-		if(comp == Comparator.EQUALTO) { return value == target; }
-		else if(comp == Comparator.GREATERTHAN) { return value > target; }
-		else { return value < target; }
 	}
 	
 	/**
