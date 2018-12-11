@@ -190,6 +190,9 @@ public class MainMenuController {
 							if(m instanceof ComboBox<?>) {
 								String s = ((ComboBox<String>) m).getValue();
 								
+								if(s == null) {
+									break;
+								}
 								if(s.equals("<=")) {
 									c = Comparator.LESSTHAN;
 								}
@@ -231,6 +234,8 @@ public class MainMenuController {
 						.collect(Collectors.toList());
 				this.foodList.getItems().clear();
 				this.foodList.getItems().addAll(searchedFood);
+				
+				this.foodCountLabel.setText("Food Item Count:" + this.foodList.getItems().size() + " Items");
 				
 			});
 			
