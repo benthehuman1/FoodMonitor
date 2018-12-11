@@ -543,11 +543,6 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
 					loc = 0;
 					cur = cur.next;
 				}
-				
-				//If we ever encounter a key greater than the query, then the query
-				//does not exist within the tree
-				if(cur.keys.get(loc).compareTo(key) > 0)
-					return ans;
 			}
         	
         	int firstEqualIndex = loc;
@@ -615,6 +610,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
 
         // some value to add to the BPTree
         Double[] dd = {0.0d, 0.5d, 0.2d, 0.8d};
+        //Double[] ss = {60.0, 350.0, 110.0, 160.0, 240.0, 210.0, 270.0, 70.0, 210.0, 30.0, 70.0, 150.0, 60.0, 15.0, 0.0, 120.0, 230.0, 90.0, 160.0, 90.0, 25.0, 130.0, 120.0, 100.0, 120.0, 0.0, 80.0, 237.0, 110.0, 280.0, 270.0, 35.0, 130.0, 60.0, 190.0, 86.0, 35.0, 270.0, 140.0, 140.0, 290.0, 120.0, 10.0, 130.0, 90.0, 10.0, 260.0, 140.0, 0.0, 70.0, 25.0, 68.0, 110.0, 140.0, 160.0, 260.0, 130.0, 140.0, 150.0, 110.0, 15.0, 190.0, 170.0, 12.0, 12.0};
 
         // build an ArrayList of those value and add to BPTree also
         // allows for comparing the contents of the ArrayList 
@@ -631,7 +627,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             System.out.println("\n\nTree structure:\n" + bpTree.toString());
             System.out.println("------------------------------------");
         }
-        List<Double> filteredValues = bpTree.rangeSearch(0.8d, "<=");
+        List<Double> filteredValues = bpTree.rangeSearch(40d, "<=");
         System.out.println("Filtered values: " + filteredValues.toString());
     }
 
