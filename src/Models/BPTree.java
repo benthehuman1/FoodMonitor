@@ -552,7 +552,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	LeafNode firstEqualNode = cur;
         	
         	//Add all equal values to list
-        	while(loc < cur.keys.size() && cur != null && cur.keys.get(loc).compareTo(key) == 0) {
+        	while(cur != null && loc < cur.keys.size() && cur.keys.get(loc).compareTo(key) == 0) {
         		ans.add(cur.values.get(loc));
         		loc++;
 				if(loc == cur.keys.size()) {

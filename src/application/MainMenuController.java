@@ -523,7 +523,8 @@ public class MainMenuController {
 	}
 	
 	public void pressFoodItem(FoodListItem foodItem) {
-		System.out.println(foodItem.toString() + ": " + foodItem.ID.toString());
+		if(foodItem != null)
+			System.out.println(foodItem.toString() + ": " + foodItem.ID.toString());
 		this.currentFoodItem = foodItem;
 	}
 	
