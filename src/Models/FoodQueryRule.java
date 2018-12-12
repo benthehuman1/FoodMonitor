@@ -1,11 +1,16 @@
 package Models;
 
+/**
+ * Stores all info regarding a query to be performed
+ * @author A-Team 71
+ */
 public class FoodQueryRule {
 	
-	private Nutrient nutrient;
-	private Comparator comparator;
-	private double value;
+	private Nutrient nutrient;		//Nutrient to based query on
+	private Comparator comparator;	//Comparison to query
+	private double value;			//Value to base comparison on
 	
+	//Getters and setters
 	public Nutrient getNutrient() {
 		return nutrient;
 	}

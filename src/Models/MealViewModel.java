@@ -5,33 +5,12 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class MealViewModel {
+	
 	private String mealName;
 	private HashMap<Nutrient, Double> nutrientInfo; //Maping the nutrient to the nutient value totals
 	private HashMap<Nutrient, Double> nutrientBarProgress; //Maping the nutrient to the proper value of the nutrient bar
 	private ArrayList<FoodViewModel> foods;
 	private UUID ID;
-	
-	
-	
-	public UUID getID() {
-		return ID;
-	}
-
-	public String getMealName() {
-		return mealName;
-	}
-
-	public HashMap<Nutrient, Double> getNutrientInfo() {
-		return nutrientInfo;
-	}
-
-	public HashMap<Nutrient, Double> getNutrientBarProgress() {
-		return nutrientBarProgress;
-	}
-
-	public ArrayList<FoodViewModel> getFoods() {
-		return foods;
-	}
 
 	public MealViewModel(Meal meal, ArrayList<FoodDataItem> foods) {
 		this.ID = meal.getID();
@@ -73,4 +52,22 @@ public class MealViewModel {
 		
 		return result;
 	}
+	
+	//Basic getters
+	public UUID getID() {
+		return ID;
+	}
+	public String getMealName() {
+		return mealName;
+	}
+	public HashMap<Nutrient, Double> getNutrientInfo() {
+		return nutrientInfo;
+	}
+	public HashMap<Nutrient, Double> getNutrientBarProgress() {
+		return nutrientBarProgress;
+	}
+	public ArrayList<FoodViewModel> getFoods() {
+		return foods;
+	}
+	
 }

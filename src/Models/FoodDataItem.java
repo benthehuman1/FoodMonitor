@@ -2,23 +2,32 @@ package Models;
 
 import java.util.UUID;
 
+/**
+ * Stores all data for an individual food item
+ * @author A-Team 71
+ */
 public class FoodDataItem implements Comparable<FoodDataItem> {
 	
-	private UUID id;
-	private String givenID;
-	private String name;
+	private UUID id;					//Unique ID for each food
+	private String givenID;				//User inputed ID
+	private String name;				//Name of the food item
+	
+	//Amount of nutrients in the food
 	private double calories;
 	private double fatGrams;
 	private double carboHydrateGrams;
 	private double fiberGrams;
 	private double proteinGrams;
 	
-	
+	/**
+	 * Compares two food items on the basis of name
+	 */
 	public int compareTo(FoodDataItem other) {
 		return this.name.compareTo(other.name);
 	}
 	
-	public String getGivenID() {
+	//Getters and setters
+	public String getGivenID() { 
 		return givenID;
 	}
 	public void setGivenID(String givenID) {
@@ -66,6 +75,5 @@ public class FoodDataItem implements Comparable<FoodDataItem> {
 	public void setProteinGrams(double proteinGrams) {
 		this.proteinGrams = proteinGrams;
 	}
-	
 	
 }

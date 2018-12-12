@@ -15,10 +15,8 @@ import javafx.scene.layout.*;
 import javafx.stage.*;
 
 /**
- * 
- * @author A-Team 71
  * Launches and manages communication between the pages / windows of the application.
- *
+ * @author A-Team 71
  */
 public class Main extends Application {
 	
@@ -32,17 +30,18 @@ public class Main extends Application {
 		this.primaryStage = primaryStage;
 		try {
 			
-			BorderPane root = new BorderPane();
-			Scene scene = new Scene(root, 1280, 720);
-			
 			Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+			BorderPane root = new BorderPane();
+			Scene scene = new Scene(root, primaryScreenBounds.getWidth(), primaryScreenBounds.getHeight());
 			
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			this.mainPage = new MainMenuController(root, this);
 			primaryStage.show();
+			primaryStage.setWidth(primaryScreenBounds.getWidth());
 			primaryStage.setHeight(primaryScreenBounds.getHeight());
 			primaryStage.setMaximized(true);
+			primaryStage.setResizable(false);
 			
 		} catch(Exception e) {
 			e.printStackTrace();
