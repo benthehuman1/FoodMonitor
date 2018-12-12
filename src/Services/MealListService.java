@@ -11,7 +11,6 @@ import Repositories.MealListRepository;
 /**
  * Handles data processing for meals, and acts as a separator from the UI and File IO.
  * @author A-Team 71
- *
  */
 public class MealListService {
 	private MealList meals;

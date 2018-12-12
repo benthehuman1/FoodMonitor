@@ -7,28 +7,32 @@ import java.util.stream.*;
 import Models.*;
 import Repositories.FoodListRepository;
 
+/**
+ * Handles data processing for food items, separates UI and file I/O
+ * @author A-Team 71
+ */
 public class FoodListService {
 	
-	String filePath;
-	//This is where ALL the data is stored. We're just querying it.
-	BPTree<Double, FoodDataItem> fiber;
-	BPTree<Double, FoodDataItem> fat; 
-	BPTree<Double, FoodDataItem> carbs; 
-	BPTree<Double, FoodDataItem> calories; 
-	BPTree<Double, FoodDataItem> protein;
 	private static final int BRANCHINGFACTOR = 10;
-	
-	ArrayList<FoodDataItem> foodList;
-	private FoodListRepository foodListRepository;
-	
-	public void SwitchToNewDataFile(String filePath){
+	private FoodListRepository foodListRepository;	//Repository to run database I/O
 		
-		//Switches the file this data is based on.
-		//Calls the repository to get the data from that file //Rebuilds the foodList BPTree with the new data.
+	//B+ Trees to store data for every nutrient for every food entry
+	private BPTree<Double, FoodDataItem> fiber;
+	private BPTree<Double, FoodDataItem> fat; 
+	private BPTree<Double, FoodDataItem> carbs; 
+	private BPTree<Double, FoodDataItem> calories; 
+	private BPTree<Double, FoodDataItem> protein;
+	
+	private ArrayList<FoodDataItem> foodList;	//List of every food item from the database
+	
+	/**
+	 * Switches the data file and rebuilds data structures using new data
+	 * @param filePath Path to new data file
+	 */
+	public void SwitchToNewDataFile(String filePath){
 		this.foodListRepository = new FoodListRepository(filePath);
 		this.foodList = foodListRepository.getAllFoodItems();
 		BuildNewFoodBPTree(foodList);
-		
 	}
 	
 	/**
