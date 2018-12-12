@@ -49,6 +49,15 @@ public class Main extends Application {
 		}
 	}
 	
+	public void removeNonNumericCharachters(String text, TextField field) {
+		if (!text.matches("\\d*")) {
+			field.setText(text.replaceAll("[^\\d|\\.]", ""));
+        }
+	}
+	
+	public void removeCommas(String text, TextField field) {
+		field.setText(text.replace(",", ""));
+	}
 	
 	public void showAddFoodItemStage() {
 		FoodDataItem foodItem = new FoodDataItem();
@@ -71,6 +80,7 @@ public class Main extends Application {
 			Label foodNameLabel = new Label("Name:");
 			foodNameLabel.setPrefWidth(100);
 			TextField foodNameFeild = new TextField();
+			foodNameFeild.textProperty().addListener((obs, oldText, newText) ->  removeCommas(newText, foodNameFeild));
 			foodNameInputContainer.getChildren().addAll(foodNameLabel, foodNameFeild);
 			inputMap.put("Name", foodNameFeild);
 			
@@ -79,14 +89,17 @@ public class Main extends Application {
 			Label foodGivenIDLabel = new Label("ID:");
 			foodGivenIDLabel.setPrefWidth(100);
 			TextField foodGivenIDFeild = new TextField();
+			foodGivenIDFeild.textProperty().addListener((obs, oldText, newText) ->  removeCommas(newText, foodGivenIDFeild));
 			foodGivenIDInputContainer.getChildren().addAll(foodGivenIDLabel, foodGivenIDFeild);
 			inputMap.put("ID", foodGivenIDFeild);
 			
 			HBox foodCaloriesInputContainer = new HBox();
 			foodCaloriesInputContainer.setPadding(new Insets(5));
 			Label foodCaloriesLabel = new Label("Calories:");
+			
 			foodCaloriesLabel.setPrefWidth(100);
 			TextField foodCaloriesFeild = new TextField();
+			foodCaloriesFeild.textProperty().addListener((obs, oldText, newText) ->  removeNonNumericCharachters(newText, foodCaloriesFeild));
 			foodCaloriesInputContainer.getChildren().addAll(foodCaloriesLabel, foodCaloriesFeild);
 			inputMap.put("Calories", foodCaloriesFeild);
 			
@@ -95,6 +108,7 @@ public class Main extends Application {
 			Label foodFatGramsLabel = new Label("Fat Grams:");
 			foodFatGramsLabel.setPrefWidth(100);
 			TextField foodFatGramsFeild = new TextField();
+			foodFatGramsFeild.textProperty().addListener((obs, oldText, newText) ->  removeNonNumericCharachters(newText, foodFatGramsFeild));
 			foodFatGramsInputContainer.getChildren().addAll(foodFatGramsLabel, foodFatGramsFeild);
 			inputMap.put("Fat Grams", foodFatGramsFeild);
 			
@@ -103,6 +117,7 @@ public class Main extends Application {
 			Label foodCarbGramsLabel = new Label("Carbohydrate Grams:");
 			foodCarbGramsLabel.setPrefWidth(100);
 			TextField foodCarbGramsFeild = new TextField();
+			foodCarbGramsFeild.textProperty().addListener((obs, oldText, newText) ->  removeNonNumericCharachters(newText, foodCarbGramsFeild));
 			foodCarbGramsInputContainer.getChildren().addAll(foodCarbGramsLabel, foodCarbGramsFeild);
 			inputMap.put("Carb Grams", foodCarbGramsFeild);
 			
@@ -111,6 +126,7 @@ public class Main extends Application {
 			Label foodFiberGramsLabel = new Label("Fiber Grams:");
 			foodFiberGramsLabel.setPrefWidth(100);
 			TextField foodFiberGramsFeild = new TextField();
+			foodFiberGramsFeild.textProperty().addListener((obs, oldText, newText) ->  removeNonNumericCharachters(newText, foodFiberGramsFeild));
 			foodFiberGramsInputContainer.getChildren().addAll(foodFiberGramsLabel, foodFiberGramsFeild);
 			inputMap.put("Fiber Grams", foodFiberGramsFeild);
 			
@@ -119,6 +135,7 @@ public class Main extends Application {
 			Label foodProteinGramsLabel = new Label("Protein Grams:");
 			foodProteinGramsLabel.setPrefWidth(100);
 			TextField foodProteinGramsFeild = new TextField();
+			foodProteinGramsFeild.textProperty().addListener((obs, oldText, newText) ->  removeNonNumericCharachters(newText, foodProteinGramsFeild));
 			foodProteinGramsInputContainer.getChildren().addAll(foodProteinGramsLabel, foodProteinGramsFeild);
 			inputMap.put("Protein Grams", foodProteinGramsFeild);
 		
@@ -164,6 +181,7 @@ public class Main extends Application {
 		foodItem.setFiberGrams(getDoubleValueFromLabel(inputMap.get("Fiber Grams")));
 		foodItem.setProteinGrams(getDoubleValueFromLabel(inputMap.get("Protein Grams")));
 		
+		
 		mainPage.addFoodItem(foodItem);
 		addDialog.close();
 	}
@@ -198,6 +216,7 @@ public class Main extends Application {
 		
 		TextField nameInput = new TextField();
 		nameInput.setText("Meal Name");
+		nameInput.textProperty().addListener((obs, oldText, newText) ->  removeCommas(newText, nameInput));
 		
 		Button addButton = new Button();
 		addButton.setText("Add");

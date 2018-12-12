@@ -1,5 +1,6 @@
 package application;
 
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -274,7 +276,7 @@ public class MainMenuController {
 		
 		//Setup Meal Details Section
 		this.mealDetailsSection = new VBox();
-		this.mealDetailsSection.setPrefWidth(700);
+		this.mealDetailsSection.setPrefWidth(715);
 		this.mealDetailsSection.setPadding(new Insets(20));
 			
 			// Setup mealRefresh_MealName
@@ -302,8 +304,16 @@ public class MainMenuController {
 			this.selectedMeal_NutrientBarContainer.setPrefHeight(200);
 			
 			//Setup foodNutritionTable
+			ScrollPane scrollPane = new ScrollPane();
+			scrollPane.setPrefWidth(715);
+			scrollPane.setMaxWidth(715);
+			//scrollPane.setMaxHeight(330);
+			
+			
 			this.nutritionTable = new GridPane();
 			this.nutritionTable.setPrefWidth(700);
+			
+			scrollPane.setContent(nutritionTable);
 			
 			//Setup addFoodToMealButton
 			Button addFoodToMealButton = new Button("+ Add Currently Selected Food to Meal");
@@ -314,7 +324,8 @@ public class MainMenuController {
 		
 		this.mealDetailsSection.getChildren().add(mealRefresh_MealName);
 		this.mealDetailsSection.getChildren().add(this.selectedMeal_NutrientBarContainer);
-		this.mealDetailsSection.getChildren().add(this.nutritionTable);
+		this.mealDetailsSection.getChildren().add(getFoodNutritionTableHeading());
+		this.mealDetailsSection.getChildren().add(scrollPane);
 		this.mealDetailsSection.getChildren().add(addFoodToMealButton);
 		//END MealDetailsSection
 		
@@ -325,8 +336,6 @@ public class MainMenuController {
 			Label mealsLabel = new Label("Meals");
 			mealsLabel.setAlignment(Pos.CENTER);
 			mealsLabel.setFont(new Font("System", 20));
-			
-			
 			
 			this.mealList = new ListView<MealListItem>();
 			this.mealList.setPrefHeight(640);
@@ -366,6 +375,7 @@ public class MainMenuController {
 		TextField quantitiy = new TextField();
 		quantitiy.setPrefWidth(90);
 		quantitiy.setText("" + quantity);
+		quantitiy.textProperty().addListener((obs, oldText, newText) ->  this.main.removeNonNumericCharachters(newText, quantitiy));
 		
 		Label caloriesLabel = new Label("" + calories);
 		caloriesLabel.setAlignment(Pos.CENTER);
@@ -538,6 +548,7 @@ public class MainMenuController {
 	}
 	
 	public void pressAddSelectedFoodToMeal() {
+		pressRefreshMealDetailsSection();
 		FoodListItem foodListItem = this.foodList.getSelectionModel().getSelectedItem();
 		MealViewModel mealViewModel = this.currentViewedMeal;
 		if(foodListItem == null) { return; }
@@ -556,7 +567,7 @@ public class MainMenuController {
 		MealViewModel mealViewModel = this.currentViewedMeal;
 		
 		HashMap<UUID, Integer> quantityMap = new HashMap<UUID, Integer>();
-		for(int i = 1; i < this.nutritionTable.getChildren().size(); i++) {
+		for(int i = 0; i < this.nutritionTable.getChildren().size(); i++) {
 			GridPane actualRow = (GridPane) this.nutritionTable.getChildren().get(i);
 			UUID foodID = (UUID) actualRow.getUserData();
 			TextField quantityInput = (TextField) actualRow.getChildren().get(2);
@@ -670,11 +681,11 @@ public class MainMenuController {
 		
 		
 		this.nutritionTable.getChildren().clear();
-		this.nutritionTable.addRow(0, getFoodNutritionTableHeading());
+		
 		for(int i = 0; i < vm.getFoods().size(); i++) {
 			ArrayList<FoodViewModel> foods = vm.getFoods();
 			FoodViewModel foodVM = foods.get(i);
-			this.nutritionTable.addRow(i+ 1, getFoodNutritionTableRow(foodVM.getName(), foodVM.getQuantity(), foodVM.getCalories(), foodVM.getFatGrams(), foodVM.getCarboHydrateGrams(), foodVM.getFiberGrams(), foodVM.getProteinGrams(), foodVM.getID()));
+			this.nutritionTable.addRow(i, getFoodNutritionTableRow(foodVM.getName(), foodVM.getQuantity(), foodVM.getCalories(), foodVM.getFatGrams(), foodVM.getCarboHydrateGrams(), foodVM.getFiberGrams(), foodVM.getProteinGrams(), foodVM.getID()));
 		}
 	}
 	
