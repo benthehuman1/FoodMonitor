@@ -202,7 +202,7 @@ public class MainMenuController {
 									value = -1;
 								}
 							}
-							if(c != null && nut != null && value >= 0) {
+							if(c != null && nut != null && value >= 0) { 
 								FoodQueryRule f = new FoodQueryRule();
 								f.setComparator(c);
 								f.setNutrient(nut);
@@ -567,6 +567,7 @@ public class MainMenuController {
 		TextField value = new TextField();
 		value.setPrefWidth(50);
 		value.setFont(new Font("System", 13));
+		value.textProperty().addListener((obs, oldText, newText) ->  this.main.removeNonNumericCharachters(newText, value));
 		
 		hBox.getChildren().add(applyRuleCheck);
 		hBox.getChildren().add(comparator);
