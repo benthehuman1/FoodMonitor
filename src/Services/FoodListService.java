@@ -16,7 +16,7 @@ public class FoodListService {
 	BPTree<Double, FoodDataItem> carbs; 
 	BPTree<Double, FoodDataItem> calories; 
 	BPTree<Double, FoodDataItem> protein;
-	private static final int BRANCHINGFACTOR = 3;
+	private static final int BRANCHINGFACTOR = 10;
 	
 	ArrayList<FoodDataItem> foodList;
 	private FoodListRepository foodListRepository;

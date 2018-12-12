@@ -1,52 +1,51 @@
 package application;
 	
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
-import javax.naming.spi.DirStateFactory.Result;
-
-import org.omg.CosNaming.NamingContextExtPackage.StringNameHelper;
-
-import Models.Comparator;
 import Models.FoodDataItem;
-import Models.FoodQuery;
-import Models.FoodQueryRule;
-import Models.Nutrient;
-import Repositories.FoodListRepository;
 import Repositories.MealListRepository;
-import Services.FoodListService;
+
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.*;
 
 
 public class Main extends Application {
 	
 	private Stage primaryStage;
 	private MainMenuController mainPage;
+	
 	@Override
 	public void start(Stage primaryStage) {
+		
 		this.primaryStage = primaryStage;
 		try {
+			
 			BorderPane root = new BorderPane();
-			Scene scene = new Scene(root,1280,720);
+			Scene scene = new Scene(root, 1280, 720);
+			
+			Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+			
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			this.mainPage = new MainMenuController(root, this);
 			primaryStage.show();
+			
+			//primaryStage.setX(primaryScreenBounds.getMinX());
+			//primaryStage.setY(primaryScreenBounds.getMinY());
+			primaryStage.setHeight(primaryScreenBounds.getHeight());
+			//primaryStage.resizableProperty().setValue(Boolean.FALSE);
+			primaryStage.setMaximized(true);
+			
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+		
 	}
 	
 	public void removeNonNumericCharachters(String text, TextField field) {
@@ -60,7 +59,6 @@ public class Main extends Application {
 	}
 	
 	public void showAddFoodItemStage() {
-		FoodDataItem foodItem = new FoodDataItem();
 		
 		Stage addDialogueStage = new Stage();
 		addDialogueStage.setTitle("Add New FoodItem");
@@ -68,7 +66,7 @@ public class Main extends Application {
 		addDialogueStage.initOwner(primaryStage);
 		
 		BorderPane root = new BorderPane();
-		Scene scene = new Scene(root, 300, 300);
+		Scene scene = new Scene(root, 300, 350);
 		
 		Label mainLabel = new Label("Add New FoodItem");
 		
@@ -160,6 +158,7 @@ public class Main extends Application {
 		addDialogueStage.showAndWait();
 			
 	}
+	
 	private UUID getRandomGUID_ProperFormat() {
 		UUID base = UUID.randomUUID();
 		String baseAsString = base.toString();
@@ -168,7 +167,6 @@ public class Main extends Application {
 		String formatedGuidString = resultAsString.substring(0, 8) + "-" + resultAsString.substring(8, 12) + "-" + resultAsString.substring(12, 16) + "-" + resultAsString.substring(16, 20) + "-" + resultAsString.substring(20) + "00000000";
 		return UUID.fromString(formatedGuidString);
 	}
-	
 	
 	private void pressAddFoodButton(HashMap<String, TextField> inputMap, Stage addDialog) {
 		FoodDataItem foodItem = new FoodDataItem();
@@ -210,7 +208,7 @@ public class Main extends Application {
 		addDialogueStage.initOwner(primaryStage);
 		
 		BorderPane root = new BorderPane();
-		Scene scene = new Scene(root, 300, 110);
+		Scene scene = new Scene(root, 300, 125);
 		
 		Label mainLabel = new Label("Add New Meal:");//borderpane top
 		

@@ -7,22 +7,14 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import Models.Comparator;
-import Models.FoodDataItem;
-import Models.FoodQuery;
-import Models.FoodViewModel;
-import Models.FoodQueryRule;
+import com.sun.prism.paint.Color;
 
-import Models.Meal;
-import Models.MealItem;
-import Models.MealViewModel;
-import Models.Nutrient;
-import Services.FoodListService;
-import Services.MealListService;
-import javafx.collections.ObservableList;
+import Models.*;
+import Services.*;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -32,6 +24,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -39,6 +33,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
+import javafx.stage.Screen;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 public class MainMenuController {
@@ -55,6 +50,8 @@ public class MainMenuController {
 	private MealViewModel currentViewedMeal;
 	
 	//Graphical Members
+	private static final Tooltip quantityToolTip = new Tooltip("Press enter to save / refresh quantities.");
+	private static final Tooltip dailyValueToolTip = new Tooltip("USDA Recomended daily value.");
 	private Label dataSetNameLabel;
 	private ListView<FoodListItem> foodList;
 	private ListView<MealListItem> mealList;
@@ -275,33 +272,31 @@ public class MainMenuController {
 		//END foodSection 
 		
 		//Setup Meal Details Section
+		Rectangle2D screen = Screen.getPrimary().getVisualBounds();
 		this.mealDetailsSection = new VBox();
-		this.mealDetailsSection.setPrefWidth(715);
+		this.mealDetailsSection.setAlignment(Pos.BASELINE_CENTER);
+		//this.mealDetailsSection.setPrefWidth(screen.getMaxX() / 8);
 		this.mealDetailsSection.setPadding(new Insets(20));
+		//this.mealDetailsSection.setTranslateX(screen.getMaxX() / 7 - this.mealDetailsSection.getWidth());
 			
 			// Setup mealRefresh_MealName
 			HBox mealRefresh_MealName = new HBox();
+			mealRefresh_MealName.setAlignment(Pos.CENTER);
 			mealRefresh_MealName.setPrefHeight(100);
 		
-			Button refreshButton = new Button();
-			refreshButton.setText("Refresh");
-			refreshButton.setFont(new Font("System", 19));
-			refreshButton.setPrefHeight(75);
-			refreshButton.setPrefWidth(100);
-			
-			refreshButton.setOnAction(e -> pressRefreshMealDetailsSection());
 		
 			this.selectedMeal_Name = new Label();
 			this.selectedMeal_Name.setFont(new Font("System", 60));
 			this.selectedMeal_Name.setAlignment(Pos.CENTER);
 			
-			mealRefresh_MealName.getChildren().add(refreshButton);
 			mealRefresh_MealName.getChildren().add(this.selectedMeal_Name);
 			
 			//Setup nutritionBars
 			this.selectedMeal_NutrientBarContainer = new VBox();
+			this.selectedMeal_NutrientBarContainer.setAlignment(Pos.CENTER);
 			this.selectedMeal_NutrientBarContainer.setPrefWidth(700);
 			this.selectedMeal_NutrientBarContainer.setPrefHeight(200);
+			this.selectedMeal_NutrientBarContainer.setMinHeight(200);
 			
 			//Setup foodNutritionTable
 			ScrollPane scrollPane = new ScrollPane();
@@ -319,7 +314,8 @@ public class MainMenuController {
 			Button addFoodToMealButton = new Button("+ Add Currently Selected Food to Meal");
 			addFoodToMealButton.setPrefWidth(700);
 			addFoodToMealButton.setPrefHeight(30);
-			addFoodToMealButton.setOnAction(e -> pressAddSelectedFoodToMeal());
+			addFoodToMealButton.setOnAction(e -> {pressRefreshMealDetailsSection();
+			pressAddSelectedFoodToMeal();});
 			
 		
 		this.mealDetailsSection.getChildren().add(mealRefresh_MealName);
@@ -373,9 +369,13 @@ public class MainMenuController {
 		foodLabel.setAlignment(Pos.CENTER);
 		
 		TextField quantitiy = new TextField();
+		quantitiy.setTooltip(quantityToolTip);
 		quantitiy.setPrefWidth(90);
 		quantitiy.setText("" + quantity);
 		quantitiy.textProperty().addListener((obs, oldText, newText) ->  this.main.removeNonNumericCharachters(newText, quantitiy));
+		
+		quantitiy.setOnAction(e ->	pressRefreshMealDetailsSection());
+		
 		
 		Label caloriesLabel = new Label("" + calories);
 		caloriesLabel.setAlignment(Pos.CENTER);
@@ -416,8 +416,11 @@ public class MainMenuController {
 	
 	private GridPane getFoodNutritionTableHeading() {
 		GridPane row = new GridPane();
+		
+		row.setAlignment(Pos.CENTER);
 		row.setPrefWidth(700);
-		row.setPrefHeight(30);
+		row.setPrefHeight(40);
+		//row.setPadding(value);
 		
 		row.setGridLinesVisible(false);
 		row.setPadding(new Insets(5));
@@ -425,17 +428,27 @@ public class MainMenuController {
 		Label foodLabel = new Label("FoodName");
 		foodLabel.setPrefWidth(150);
 		
-		Label quantitiy = new Label("Quantity");
-		quantitiy.setPrefWidth(85);
+		HBox quantityLabels = new HBox();
+		quantityLabels.setPrefWidth(85);
+		
+			Label quantitiy = new Label("Quantity");
+			//quantitiy.setPrefWidth(78);
+		
+			Label quantitiyTip = new Label(" ? ");
+			quantitiyTip.setTooltip(quantityToolTip);
+			quantitiyTip.setTextFill(javafx.scene.paint.Color.BLUE);
+			//quantitiyTip.setPrefWidth(7);
+			
+		quantityLabels.getChildren().addAll(quantitiy, quantitiyTip);
 		
 		Label caloriesLabel = new Label("Calories");
-		caloriesLabel.setPrefWidth(85);
+		caloriesLabel.setPrefWidth(84);
 		
 		Label fatGramsLabel = new Label("Fat Grams");
-		fatGramsLabel.setPrefWidth(85);
+		fatGramsLabel.setPrefWidth(84);
 		
 		Label carbGramsLabel = new Label("Carb Grams");
-		carbGramsLabel.setPrefWidth(85);
+		carbGramsLabel.setPrefWidth(84);
 		
 		Label fiberGramsLabel = new Label("Fiber Grams");
 		fiberGramsLabel.setPrefWidth(85);
@@ -447,7 +460,8 @@ public class MainMenuController {
 		empty.setPrefWidth(10);
 		
 		row.addColumn(0, foodLabel);
-		row.addColumn(1, quantitiy);
+		row.addColumn(1, quantityLabels);
+		//row.addColumn(2, quantitiyTip);
 		row.addColumn(2, caloriesLabel);
 		row.addColumn(3, fatGramsLabel);
 		row.addColumn(4, carbGramsLabel);
@@ -459,6 +473,7 @@ public class MainMenuController {
 	
 	private HBox getMealNutritionBar(String nutrient, double value, double barVal, String dailyValue) {
 		HBox hBox = new HBox();
+		hBox.setAlignment(Pos.CENTER);
 		hBox.setPrefWidth(700);
 		hBox.setPrefHeight(35);
 		
@@ -468,7 +483,8 @@ public class MainMenuController {
 		
 		Label nutrientValue = new Label();
 		nutrientValue.setText("" + value);
-		nutrientValue.setPrefWidth(50);
+		nutrientValue.setPrefWidth(60);
+		nutrientValue.setMinWidth(60);
 		
 		ProgressBar bar = new ProgressBar();
 		bar.setPrefHeight(30);
@@ -476,9 +492,46 @@ public class MainMenuController {
 		bar.setProgress(barVal);
 		
 		Label dailyValueLabel = new Label(dailyValue);
-		dailyValueLabel.setPrefWidth(50);
+		dailyValueLabel.setPrefWidth(70);
+		dailyValueLabel.setMinWidth(70);
 		
 		hBox.getChildren().setAll(nutrientLabel, nutrientValue, bar, dailyValueLabel);
+		
+		return hBox;
+	}
+	
+	private HBox getMealNutritionBarHeading() {
+		HBox hBox = new HBox();
+		hBox.setAlignment(Pos.CENTER);
+		hBox.setPrefWidth(700);
+		hBox.setPrefHeight(35);
+		
+		Label nutrientLabel = new Label();
+		nutrientLabel.setText("Nutrient");
+		nutrientLabel.setPrefWidth(150);
+		
+		Label nutrientValueLabel = new Label();
+		nutrientValueLabel.setText("Value:");
+		nutrientValueLabel.setPrefWidth(60);
+		nutrientValueLabel.setMinWidth(60);
+		
+		Label barLabel = new Label("Proportion of recomended values.");
+		barLabel.setPrefHeight(30);
+		barLabel.setPrefWidth(400);
+		
+		Label dailyValueLabel = new Label("DV");
+		dailyValueLabel.setPrefWidth(50);
+		dailyValueLabel.setMinWidth(50);
+		
+		
+		Label dailyValueQuestion = new Label("?");
+		dailyValueQuestion.setTextFill(javafx.scene.paint.Color.BLUE);
+		dailyValueQuestion.setTooltip(dailyValueToolTip);
+		dailyValueQuestion.setPrefWidth(20);
+		dailyValueQuestion.setMinWidth(20);
+
+		
+		hBox.getChildren().setAll(nutrientLabel, nutrientValueLabel, barLabel, dailyValueLabel, dailyValueQuestion);
 		
 		return hBox;
 	}
@@ -673,6 +726,7 @@ public class MainMenuController {
 		
 		this.selectedMeal_Name.setText(vm.getMealName());
 		this.selectedMeal_NutrientBarContainer.getChildren().clear();
+		this.selectedMeal_NutrientBarContainer.getChildren().add(getMealNutritionBarHeading());
 		this.selectedMeal_NutrientBarContainer.getChildren().add(getMealNutritionBar("Calories", vm.getNutrientInfo().get(Nutrient.CALORIES), vm.getNutrientBarProgress().get(Nutrient.CALORIES), "2000 (cal)"));
 		this.selectedMeal_NutrientBarContainer.getChildren().add(getMealNutritionBar("Fat Grams", vm.getNutrientInfo().get(Nutrient.FATGRAMS), vm.getNutrientBarProgress().get(Nutrient.FATGRAMS), "65 (g)"));
 		this.selectedMeal_NutrientBarContainer.getChildren().add(getMealNutritionBar("Carb Grams", vm.getNutrientInfo().get(Nutrient.CARBGRAMS), vm.getNutrientBarProgress().get(Nutrient.CARBGRAMS), "300 (g)"));

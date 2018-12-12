@@ -2,8 +2,6 @@ package Models;
 
 import java.util.UUID;
 
-import org.omg.CORBA.PUBLIC_MEMBER;
-
 public class FoodDataItem implements Comparable<FoodDataItem> {
 	
 	private UUID id;
