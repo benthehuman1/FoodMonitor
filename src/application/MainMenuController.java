@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.sun.prism.paint.Color;
-
 import Models.*;
 import Services.*;
 
@@ -25,7 +23,6 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -36,34 +33,41 @@ import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 import javafx.stage.FileChooser.ExtensionFilter;
 
+/**
+ * Creates and Manages the UI elements in the main menu, and hooks them up with backend code
+ * @author A-Team 71.
+ */
 public class MainMenuController {
 	
 	//Logical Members
-	private static final String DEFAULT_DATASET_PATH = "./Data/FoodDataSets/defaultFoodData.csv";
-	private Main main;
-	private String currentFoodDataFile;
-	private FoodListItem currentFoodItem;
+	private static final String DEFAULT_DATASET_PATH = "./Data/FoodDataSets/defaultFoodData.csv"; //The path to the default foodDataFile, reletive to the projct root.
+	private Main main; //Reference to the Main runner class that launched this class.
+	private String currentFoodDataFile; //Reference to the dataFile that the current displayed food is from.
+	private FoodListItem currentFoodItem; //Reference to the food that the user currently has selected.
 	
-	FoodListService foodService; 
-	MealListService mealService;
+	FoodListService foodService; //The Foodservice class that handles logic and data operations for FoodItems
+	MealListService mealService; //The MealSerice class that handles logic and data operations for Meals.
 	
-	private MealViewModel currentViewedMeal;
+	private MealViewModel currentViewedMeal; //The ViewModel that contains data for the currently selected/ analyzed meal.
 	
 	//Graphical Members
-	private static final Tooltip quantityToolTip = new Tooltip("Press enter to save / refresh quantities.");
-	private static final Tooltip dailyValueToolTip = new Tooltip("USDA Recomended daily value.");
-	private Label dataSetNameLabel;
-	private ListView<FoodListItem> foodList;
-	private ListView<MealListItem> mealList;
-	private Label foodCountLabel;
+	private static final Tooltip quantityToolTip = new Tooltip("Press enter to save / refresh quantities."); //Tooltip for editing the quantity of food items in a meal.
+	private static final Tooltip dailyValueToolTip = new Tooltip("USDA Recomended daily value."); //Tooltip explaining the meaning/source of the daily value totals in the meal analisis.
+	private Label dataSetNameLabel; //Label showing what foodDataFile is being used.
+	private ListView<FoodListItem> foodList; //The list of food on the left-hand side of the main menu.
+	private ListView<MealListItem> mealList; //The list of meals on the right-hand side of the main menu.
+	private Label foodCountLabel; //A label with the number of fod items currently displayed in the foodlist.
 	
 		//Meal DetailSection
-		private VBox mealDetailsSection;
-		private Label selectedMeal_Name;
-		private VBox selectedMeal_NutrientBarContainer;
-		private GridPane nutritionTable;
+		private VBox mealDetailsSection; //The VBox caintinging the information/ analyisis of the currently selected meal.
+		private Label selectedMeal_Name; //A Label displaying the name of the currently displayed meal;
+		private VBox selectedMeal_NutrientBarContainer;// A VBox with each of the "Nutrient bars, showing the nutrient usage for the currently displayed meal.
+		private GridPane nutritionTable; //A Table with nutrient data for each FoodItem in the currently selected meal.
 	
-	
+	/**
+	 * A class used to pair the name of a food with it's ID
+	 * @author A-Team 71.
+	 */
 	class FoodListItem{
 		private String foodName;
 		private UUID ID;
@@ -73,15 +77,14 @@ public class MainMenuController {
 			this.ID = food.getId();
 		}
 		
-		public String toString() {
-			return this.foodName;
-		}
-		
-		public UUID getFoodID() {
-			return this.ID;
-		}
+		public String toString() { return this.foodName; }//This is what's being displayed in the list.
+		public UUID getFoodID() { return this.ID;}
 	}
 	
+	/**
+	 * A class used to pair the name of a meal with it's ID
+	 * @author A-Team 71.
+	 */
 	class MealListItem{
 		private String mealName;
 		private UUID ID;
@@ -90,15 +93,11 @@ public class MainMenuController {
 			this.mealName = meal.getName();
 			this.ID = meal.getID();
 		}
-		
-		public String toString() {
-			return this.mealName;
-		}
-		
-		public UUID getMealID() {
-			return this.ID;
-		}
+		public String toString() { return this.mealName; }//This is what's being displayed in the list.
+		public UUID getMealID() { return this.ID;}
 	}
+	
+	//-------------------------------------- Graphics Setup / Generators --------------------------------------//
 	
 	/**
 	 * Creates / Sets up the graphical elements of the page. 
@@ -107,23 +106,15 @@ public class MainMenuController {
 	 * @param pageRoot
 	 */
 	public void initializeElements_Main(BorderPane pageRoot) {
-		//Set pageRoot properties
-		pageRoot.setPadding(new Insets(10.0));
-		
-		//Setup applicationTitleLabel
-		Label applicationTitleLabel = new Label();
-		//applicationTitleLabel.setText("CS-400 Finalz Project");
-		//applicationTitleLabel.setFont(new Font("System", 18.0));
-		//pageRoot.setAlignment(applicationTitleLabel, Pos.CENTER);
+		pageRoot.setPadding(new Insets(10.0));	
 		
 		HBox pageHeader = new HBox();
 		pageHeader.setPrefHeight(35);
 		
 		Button loadNewDataSetButton = new Button();
-		loadNewDataSetButton.setText("Load New Data Set");
+		loadNewDataSetButton.setText("Load Data Set");
 		
-		loadNewDataSetButton.setOnAction(e -> openFileChooser());
-		
+		loadNewDataSetButton.setOnAction(e -> loadDataFile());
 		
 		this.dataSetNameLabel = new Label();
 		this.dataSetNameLabel.setText("defaultFoodData.csv");
@@ -275,9 +266,7 @@ public class MainMenuController {
 		Rectangle2D screen = Screen.getPrimary().getVisualBounds();
 		this.mealDetailsSection = new VBox();
 		this.mealDetailsSection.setAlignment(Pos.BASELINE_CENTER);
-		//this.mealDetailsSection.setPrefWidth(screen.getMaxX() / 8);
 		this.mealDetailsSection.setPadding(new Insets(20));
-		//this.mealDetailsSection.setTranslateX(screen.getMaxX() / 7 - this.mealDetailsSection.getWidth());
 			
 			// Setup mealRefresh_MealName
 			HBox mealRefresh_MealName = new HBox();
@@ -314,8 +303,7 @@ public class MainMenuController {
 			Button addFoodToMealButton = new Button("+ Add Currently Selected Food to Meal");
 			addFoodToMealButton.setPrefWidth(700);
 			addFoodToMealButton.setPrefHeight(30);
-			addFoodToMealButton.setOnAction(e -> {pressRefreshMealDetailsSection();
-			pressAddSelectedFoodToMeal();});
+			addFoodToMealButton.setOnAction(e -> pressAddSelectedFoodToMeal());
 			
 		
 		this.mealDetailsSection.getChildren().add(mealRefresh_MealName);
@@ -348,14 +336,25 @@ public class MainMenuController {
 		mealSelectionSection.getChildren().add(this.mealList);
 		mealSelectionSection.getChildren().add(newMealButton);
 		
-		
-		
+
 		pageRoot.setTop(pageHeader);
 		pageRoot.setLeft(foodSection);
 		pageRoot.setCenter(mealDetailsSection);
 		pageRoot.setRight(mealSelectionSection);
 	}
 	
+	/**
+	 * Generates a row in the nutrition table, given information about that food.
+	 * @param food
+	 * @param quantity
+	 * @param calories
+	 * @param fatGrams
+	 * @param carbGrams
+	 * @param fiberGrams
+	 * @param proteinGrams
+	 * @param foodID
+	 * @return
+	 */
 	private GridPane getFoodNutritionTableRow(String food, int quantity, double calories, double fatGrams, double carbGrams, double fiberGrams, double proteinGrams, UUID foodID) {
 		GridPane row = new GridPane();
 		row.setPrefWidth(700);
@@ -373,9 +372,7 @@ public class MainMenuController {
 		quantitiy.setPrefWidth(90);
 		quantitiy.setText("" + quantity);
 		quantitiy.textProperty().addListener((obs, oldText, newText) ->  this.main.removeNonNumericCharachters(newText, quantitiy));
-		
-		quantitiy.setOnAction(e ->	pressRefreshMealDetailsSection());
-		
+		quantitiy.setOnAction(e ->	refreshMealDetailsSection());
 		
 		Label caloriesLabel = new Label("" + calories);
 		caloriesLabel.setAlignment(Pos.CENTER);
@@ -402,7 +399,6 @@ public class MainMenuController {
 		removeFoodButton.setText("X");
 		removeFoodButton.setOnAction(e -> pressRemoveFoodFromMeal(foodID));
 		
-		
 		row.addColumn(0, foodLabel);
 		row.addColumn(1, quantitiy);
 		row.addColumn(2, caloriesLabel);
@@ -414,6 +410,9 @@ public class MainMenuController {
 		return row;
 	}
 	
+	/**
+	 * Generates a GridPane with heading information for each column of the nutrition table.
+	 */
 	private GridPane getFoodNutritionTableHeading() {
 		GridPane row = new GridPane();
 		
@@ -432,12 +431,10 @@ public class MainMenuController {
 		quantityLabels.setPrefWidth(85);
 		
 			Label quantitiy = new Label("Quantity");
-			//quantitiy.setPrefWidth(78);
 		
 			Label quantitiyTip = new Label(" ? ");
 			quantitiyTip.setTooltip(quantityToolTip);
 			quantitiyTip.setTextFill(javafx.scene.paint.Color.BLUE);
-			//quantitiyTip.setPrefWidth(7);
 			
 		quantityLabels.getChildren().addAll(quantitiy, quantitiyTip);
 		
@@ -461,7 +458,6 @@ public class MainMenuController {
 		
 		row.addColumn(0, foodLabel);
 		row.addColumn(1, quantityLabels);
-		//row.addColumn(2, quantitiyTip);
 		row.addColumn(2, caloriesLabel);
 		row.addColumn(3, fatGramsLabel);
 		row.addColumn(4, carbGramsLabel);
@@ -471,6 +467,14 @@ public class MainMenuController {
 		return row;
 	}
 	
+	/**
+	 * Generates an HBox with information about the amount of a nutrient in a meal
+	 * @param nutrient
+	 * @param value
+	 * @param barVal
+	 * @param dailyValue
+	 * @return
+	 */
 	private HBox getMealNutritionBar(String nutrient, double value, double barVal, String dailyValue) {
 		HBox hBox = new HBox();
 		hBox.setAlignment(Pos.CENTER);
@@ -500,6 +504,10 @@ public class MainMenuController {
 		return hBox;
 	}
 	
+	/**
+	 * Generates an HBox with heading information for each of the nutrition bars for a Meal.
+	 * @return
+	 */
 	private HBox getMealNutritionBarHeading() {
 		HBox hBox = new HBox();
 		hBox.setAlignment(Pos.CENTER);
@@ -523,19 +531,22 @@ public class MainMenuController {
 		dailyValueLabel.setPrefWidth(50);
 		dailyValueLabel.setMinWidth(50);
 		
-		
 		Label dailyValueQuestion = new Label("?");
 		dailyValueQuestion.setTextFill(javafx.scene.paint.Color.BLUE);
 		dailyValueQuestion.setTooltip(dailyValueToolTip);
 		dailyValueQuestion.setPrefWidth(20);
 		dailyValueQuestion.setMinWidth(20);
 
-		
 		hBox.getChildren().setAll(nutrientLabel, nutrientValueLabel, barLabel, dailyValueLabel, dailyValueQuestion);
 		
 		return hBox;
 	}
 	
+	/**
+	 * Generates an Hbox with controls used to filter the foodlist by a certain nutrient. 
+	 * @param nutrient
+	 * @return
+	 */
 	private HBox getSearchRuleHBox(String nutrient) {
 		HBox hBox = new HBox();
 		hBox.setPrefHeight(20);
@@ -564,10 +575,73 @@ public class MainMenuController {
 		return hBox;
 	}
 	
+	//-------------------------------------- Event Handlers --------------------------------------//
 	
-	//Here is where the logic begins.
+	/**
+	 * Called when the user clicks on a meal from the MealList.
+	 * @param meal
+	 */
+	public void pressMeal(MealListItem meal) {
+		MealViewModel firstMealViewModel = this.mealService.getMealViewModelForMealID(meal.ID);
+		this.LoadMealInfoSection(firstMealViewModel);
+		
+	}
+	
+	/**
+	 * Called when the user clicks on a food from the foodList.
+	 * @param foodItem
+	 */
+	public void pressFoodItem(FoodListItem foodItem) {
+		this.currentFoodItem = foodItem;
+	}
+	
+	/**
+	 * Called when the user clicks to add a new food Item.
+	 */
+	public void pressAddFood() {
+		main.showAddFoodItemStage();
+	}
+	
+	/**
+	 * Called when the user clicks to add a new mealItem.
+	 */
+	public void pressAddMeal() {
+		main.showAddMealStage();
+	}
+	
+	/**
+	 * Called when the user clicks to add the selected food item to the currently viewed meal.
+	 */
+	public void pressAddSelectedFoodToMeal() {
+		refreshMealDetailsSection();
+		
+		FoodListItem foodListItem = this.foodList.getSelectionModel().getSelectedItem();
+		MealViewModel mealViewModel = this.currentViewedMeal;
+		
+		if(foodListItem == null) { return; }
+		
+		this.mealService.addFoodToMeal(mealViewModel.getID(), foodListItem.ID);
+		MealViewModel firstMealViewModel = this.mealService.getMealViewModelForMealID(mealViewModel.getID());
+		this.LoadMealInfoSection(firstMealViewModel);
+	}
+	
+	/**
+	 * Called when the user clicks to remove a food item from a meal.
+	 * @param foodID
+	 */
+	public void pressRemoveFoodFromMeal(UUID foodID) {
+		this.mealService.removeFoodFromMeal(this.currentViewedMeal.getID(), foodID);
+		MealViewModel firstMealViewModel = this.mealService.getMealViewModelForMealID(this.currentViewedMeal.getID());
+		this.LoadMealInfoSection(firstMealViewModel);
+	}
+	
+
+	//-------------------------------------- Logical Methods --------------------------------------//
+	
+	
 	public MainMenuController(BorderPane pageRoot, Main main){
 		this.main = main;
+		//Creates all the elements of the mainMenu.
 		initializeElements_Main(pageRoot);
 		this.foodService = new FoodListService();
 		this.foodService.SwitchToNewDataFile(DEFAULT_DATASET_PATH);
@@ -578,47 +652,13 @@ public class MainMenuController {
 		LoadDefault();
 	}
 	
-	public void pressMeal(MealListItem meal) {
-		System.out.println(meal.toString() + ": " + meal.ID.toString());
-		MealViewModel firstMealViewModel = this.mealService.getMealViewModelForMealID(meal.ID);
-		this.LoadMealInfoSection(firstMealViewModel);
-		
-	}
-	
-	public void pressFoodItem(FoodListItem foodItem) {
-		if(foodItem != null)
-			System.out.println(foodItem.toString() + ": " + foodItem.ID.toString());
-		this.currentFoodItem = foodItem;
-	}
-	
-	public void pressAddFood() {
-		main.showAddFoodItemStage();
-	}
-	
-	
-	public void pressAddMeal() {
-		main.showAddMealStage();
-	}
-	
-	public void pressAddSelectedFoodToMeal() {
-		pressRefreshMealDetailsSection();
-		FoodListItem foodListItem = this.foodList.getSelectionModel().getSelectedItem();
-		MealViewModel mealViewModel = this.currentViewedMeal;
-		if(foodListItem == null) { return; }
-		this.mealService.addFoodToMeal(mealViewModel.getID(), foodListItem.ID);
-		MealViewModel firstMealViewModel = this.mealService.getMealViewModelForMealID(mealViewModel.getID());
-		this.LoadMealInfoSection(firstMealViewModel);
-	}
-	
-	public void pressRemoveFoodFromMeal(UUID foodID) {
-		this.mealService.removeFoodFromMeal(this.currentViewedMeal.getID(), foodID);
-		MealViewModel firstMealViewModel = this.mealService.getMealViewModelForMealID(this.currentViewedMeal.getID());
-		this.LoadMealInfoSection(firstMealViewModel);
-	}
-	
-	public void pressRefreshMealDetailsSection() {
+	/**
+	 * Runs/ Refreshes the meal analysis of the currently selected meal. 
+	 */
+	public void refreshMealDetailsSection() {
 		MealViewModel mealViewModel = this.currentViewedMeal;
 		
+		//Create and populate a map between the the ID of a food in the meal and it's displayed/specified quantity.
 		HashMap<UUID, Integer> quantityMap = new HashMap<UUID, Integer>();
 		for(int i = 0; i < this.nutritionTable.getChildren().size(); i++) {
 			GridPane actualRow = (GridPane) this.nutritionTable.getChildren().get(i);
@@ -629,12 +669,14 @@ public class MainMenuController {
 		}
 		
 		this.mealService.updateMealItemQuantities(mealViewModel.getID(), quantityMap);
-		
 		MealViewModel firstMealViewModel = this.mealService.getMealViewModelForMealID(mealViewModel.getID());
 		this.LoadMealInfoSection(firstMealViewModel);
 	}
 	
-	
+	/**
+	 * Adds a new Meal with the name "mealName" to the mealList and to the DataFile. Called from Main.
+	 * @param mealName
+	 */
 	public void addMeal(String mealName) {
 		Meal result = new Meal();
 		result.setMealItems(new ArrayList<MealItem>());
@@ -649,6 +691,10 @@ public class MainMenuController {
 		}
 	}
 	
+	/**
+	 * Adds a new FoodDataItem to the foodList and to the DataFile. Called from Main.
+	 * @param foodItem
+	 */
 	public void addFoodItem(FoodDataItem foodItem) {
 		FoodListItem item = new FoodListItem(foodItem);
 		this.foodList.getItems().add(item);
@@ -656,9 +702,11 @@ public class MainMenuController {
 		this.foodService.addFoodItem(foodItem);
 	}
 	
-	
-	
-	public void openFileChooser() {
+	/**
+	 * Opens a file open dialog, loads the selected food data file into memory, and displays the food items of that file on the foodList.
+	 */
+	public void loadDataFile() {
+		//Get the opened file.
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.getExtensionFilters().add(new ExtensionFilter("CSV", "*.csv"));
 		fileChooser.setTitle("Open Resource File");
@@ -673,33 +721,35 @@ public class MainMenuController {
 		}
 		this.currentFoodDataFile = selectedFile.getPath();
 		
-		//Handle MealLists
-		this.mealService.addNewFoodFile(selectedFile.getPath());
-		 
-		
 		LoadNewFoodFile(selectedFile.getPath());
-		
 	}
 	
+	/**
+	 * Handles back-end operations involved with adding in a new DataFile
+	 * @param foodDataFilePath
+	 */
 	public void LoadNewFoodFile(String foodDataFilePath) {
+		this.mealService.addNewFoodFile(foodDataFilePath);
 		this.foodService.SwitchToNewDataFile(foodDataFilePath);
 		
 		this.mealService.UpdateToNewDataFile(foodDataFilePath);
 		
 		LoadDefault();
 	}
-	
-	
+	/**
+	 * /Loads the three sections of content onto the view, including the FoodItems list (All Items, assumes blank query), 
+	 * the meal info pane. (Empty), and the meal list, with all meals for that particular datafile.
+	 */
 	public void LoadDefault(){
-		//Loads the three sections of content onto the view, including the FoodItems list (All Items, assumes blank query), the meal info pane. (Empty), and the meal list, with all meals for that particular datafile.
-		//Pre-Conditions: foodservice and mealService have had their data already loaded in and are ready to be queried.
+		//Pre-Conditions: FoodService and mealService have had their data already loaded in and are ready to be queried.
 		this.foodList.getItems().clear();
 		this.mealList.getItems().clear();
 		this.LoadDefaultFoodItems();
+		//If there are no meals assotiated with that the current data file, hide the mealDetailsSection.
 		if(this.mealService.GetAllMeals() == null || this.mealService.GetAllMeals().isEmpty()) {
 			this.mealDetailsSection.setVisible(false);
-			
 		}
+		//Setup the mealDetailsSection
 		else {
 			this.mealDetailsSection.setVisible(true);
 			Meal firstMeal = this.mealService.GetAllMeals().get(0);
@@ -707,9 +757,11 @@ public class MainMenuController {
 			this.LoadMealInfoSection(firstMealViewModel);
 			this.LoadDefaultMealList();
 		}
-		
-		
 	}
+	
+	/**
+	 * Displays all food items from the data file in the foodList.
+	 */
 	public void LoadDefaultFoodItems(){
 		ArrayList<FoodListItem> listContents = (ArrayList<FoodListItem>) this.foodService.Query(new FoodQuery())
 				.stream()
@@ -719,9 +771,14 @@ public class MainMenuController {
 		this.foodCountLabel.setText("Food Item Count:" + this.foodList.getItems().size() + " Items");
 	}
 	
+	/**
+	 * Displays the mealDetailsSection based on the data in a given MealViewModel
+	 * @param vm
+	 */
 	public void LoadMealInfoSection(MealViewModel vm){
 		this.currentViewedMeal = vm;
-		//Sets the MealInfoSection int the view to blank
+		
+		//Sets the MealInfoSection in the view to blank
 		this.mealDetailsSection.setDisable(false);
 		
 		this.selectedMeal_Name.setText(vm.getMealName());
@@ -743,10 +800,9 @@ public class MainMenuController {
 		}
 	}
 	
-	public void LoadEMPTYMealInfoSection() {
-		this.mealDetailsSection.setDisable(true);
-	}
-	
+	/**
+	 * Displays all meals assotiated with the current foodDataFile on the mealList.
+	 */
 	public void LoadDefaultMealList(){
 		ArrayList<MealListItem> mealListContents = (ArrayList<MealListItem>) this.mealService.GetAllMeals()
 				.stream()

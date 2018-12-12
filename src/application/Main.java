@@ -14,11 +14,17 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.*;
 
-
+/**
+ * 
+ * @author A-Team 71
+ * Launches and manages communication between the pages / windows of the application.
+ *
+ */
 public class Main extends Application {
 	
-	private Stage primaryStage;
-	private MainMenuController mainPage;
+	
+	private Stage primaryStage; //Reference to the stage that the mainMenu sits on.
+	private MainMenuController mainPage; //Reference to the main menu.
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -35,11 +41,7 @@ public class Main extends Application {
 			primaryStage.setScene(scene);
 			this.mainPage = new MainMenuController(root, this);
 			primaryStage.show();
-			
-			//primaryStage.setX(primaryScreenBounds.getMinX());
-			//primaryStage.setY(primaryScreenBounds.getMinY());
 			primaryStage.setHeight(primaryScreenBounds.getHeight());
-			//primaryStage.resizableProperty().setValue(Boolean.FALSE);
 			primaryStage.setMaximized(true);
 			
 		} catch(Exception e) {
@@ -48,18 +50,28 @@ public class Main extends Application {
 		
 	}
 	
+	/**
+	 * Assuming "text" is the text content of "field", removes all non-numeric characters from fields text. 
+	 * @param: text: the current text content of "field'.
+	 */
 	public void removeNonNumericCharachters(String text, TextField field) {
 		if (!text.matches("\\d*")) {
 			field.setText(text.replaceAll("[^\\d|\\.]", ""));
         }
 	}
 	
+	/**
+	 * Assuming "text" is the text content of "field", removes all commas from fields text. Used to prevent CSV issues.
+	 * @param: text: the current text content of "field'.
+	 */
 	public void removeCommas(String text, TextField field) {
 		field.setText(text.replace(",", ""));
 	}
 	
+	/**
+	 * Sets up and displays the AddFoodItem stage. 
+	 */
 	public void showAddFoodItemStage() {
-		
 		Stage addDialogueStage = new Stage();
 		addDialogueStage.setTitle("Add New FoodItem");
 		addDialogueStage.initModality(Modality.WINDOW_MODAL);
@@ -72,12 +84,14 @@ public class Main extends Application {
 		
 		HashMap<String, TextField> inputMap = new HashMap<String, TextField>();
 		
+		//In hindsight, I shouldv'e extracted these into their own method, as we do in MainMenuController
 		VBox inputs = new VBox();
 			HBox foodNameInputContainer = new HBox();
 			foodNameInputContainer.setPadding(new Insets(5));
 			Label foodNameLabel = new Label("Name:");
 			foodNameLabel.setPrefWidth(100);
 			TextField foodNameFeild = new TextField();
+			//When the text is updated, remove commas. Essentially not allowing the user to type commas.
 			foodNameFeild.textProperty().addListener((obs, oldText, newText) ->  removeCommas(newText, foodNameFeild));
 			foodNameInputContainer.getChildren().addAll(foodNameLabel, foodNameFeild);
 			inputMap.put("Name", foodNameFeild);
@@ -159,16 +173,13 @@ public class Main extends Application {
 			
 	}
 	
-	private UUID getRandomGUID_ProperFormat() {
-		UUID base = UUID.randomUUID();
-		String baseAsString = base.toString();
-		baseAsString = baseAsString.replaceAll("\\-", "");
-		String resultAsString = baseAsString.substring(0, 24);
-		String formatedGuidString = resultAsString.substring(0, 8) + "-" + resultAsString.substring(8, 12) + "-" + resultAsString.substring(12, 16) + "-" + resultAsString.substring(16, 20) + "-" + resultAsString.substring(20) + "00000000";
-		return UUID.fromString(formatedGuidString);
-	}
-	
+	/**
+	 * Handled what should happen when the user clicks the add button. 
+	 * @param inputMap: A HashMap that matches a nutrient/fields label to its actual field.
+	 * @param addDialog The stage that this button was clicked from.
+	 */
 	private void pressAddFoodButton(HashMap<String, TextField> inputMap, Stage addDialog) {
+		//Setup FoodItem
 		FoodDataItem foodItem = new FoodDataItem();
 		foodItem.setName(inputMap.get("Name").getText());
 		foodItem.setGivenID(inputMap.get("ID").getText());
@@ -179,11 +190,16 @@ public class Main extends Application {
 		foodItem.setFiberGrams(getDoubleValueFromLabel(inputMap.get("Fiber Grams")));
 		foodItem.setProteinGrams(getDoubleValueFromLabel(inputMap.get("Protein Grams")));
 		
-		
+		//Passes that fooditem to the main page, whitch will display it and save it to the data. 
 		mainPage.addFoodItem(foodItem);
 		addDialog.close();
 	}
 	
+	/**
+	 * Extracts the numerical information from a TextFeild. If there are any charachters other than [0-9] & ".", returns 0.0
+	 * @param field the feild in question.
+	 * @return
+	 */
 	public static double getDoubleValueFromLabel(TextField field) {
 		String text = field.getText();
 		if(text.isEmpty() || !isValidDoubleString(text)) { return 0.0; }
@@ -192,6 +208,11 @@ public class Main extends Application {
 		}
 	}
 	
+	/**
+	 * Verifies that the input string can be parsed as a double.
+	 * @param input
+	 * @return true if the input string can be parsed as a double. 
+	 */
 	public static boolean isValidDoubleString(String input) {
 		String validChars = ".0123456789";
 		for(char c : input.toCharArray()) {
@@ -201,6 +222,9 @@ public class Main extends Application {
 		return true;
 	}
 	
+	/**
+	 * Sets up and shows the AddMeal Dialog/Stage.
+	 */
 	public void showAddMealStage() {
 		Stage addDialogueStage = new Stage();
 		addDialogueStage.setTitle("Add New Meal");
@@ -228,24 +252,29 @@ public class Main extends Application {
 		addDialogueStage.showAndWait();
 	}
 	
+	/**
+	 * Handles everything that should happen in the back-end when the user clicks to add the meal to the database. 
+	 * @param mealName
+	 * @param addDialog
+	 */
 	private void pressAddMealButton(String mealName, Stage addDialog) {
 		this.mainPage.addMeal(mealName);
 		addDialog.close();
 	}
 	
+	/**
+	 * 
+	 * @return the stage that contains the main menu.
+	 */
 	public Stage getMainStage() {
 		return this.primaryStage;
 	}
 	
+	/**
+	 * Launches the program.
+	 * @param args
+	 */
 	public static void main(String[] args) {
-		
-		for(int i = 0; i < 20; i++) {
-			String result = "";
-			result += (99 + (Math.random() * 2.0));
-			System.out.println(result.substring(0, 8));
-		}
-		MealListRepository mealListRepository = new MealListRepository();
-		
 		launch(args);
 	}
 }

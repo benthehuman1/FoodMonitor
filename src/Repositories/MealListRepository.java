@@ -26,16 +26,20 @@ import Models.Meal;
 import Models.MealItem;
 import Models.MealList;
 
+/**
+ * Handles File Interaction for the list of meals. 
+ * @author A-Team 71
+ *
+ */
 public class MealListRepository {
 	HashMap<String, MealList> data;
 	JSONObject obj;
 	private static final String MEALS_FILE_PATH = "./Data/Meals.json";
 	
+	/**
+	 * Populates this.data with a HashMap mapping a dataFilePath to the list of meals associated with that file. Reads Meals.json.
+	 */
 	public MealListRepository()   {
-		//throw new OperationNotSupportedException("Not implemented");
-		//TODO: IMPLEMENT
-		//USES SOME JSON Library to parse out the data from Meals.json into this.data. 
-		//See Data Readme.txt for structure.
 		this.data = new HashMap<String, MealList>();
 		
 		try {
@@ -50,12 +54,15 @@ public class MealListRepository {
 				this.data.put(dataSetFileName, mealList);
 			}
 			
-		} catch (Exception e) {
-			// TODO: handle exception
-			System.out.print(e);
-		}
+		} catch (Exception e) { System.out.print(e); }
 	}
 	
+	/**
+	 * Generates a MealList object from the JSON representation of a list of meals.
+	 * @param meals
+	 * @param foodFileName
+	 * @return
+	 */
 	private MealList getMealListForJSONData(JSONArray meals, String foodFileName) {
 		MealList result = new MealList(foodFileName);
 		
@@ -84,7 +91,9 @@ public class MealListRepository {
 		result.setMeals(listOfMeals);
 		return result;
 	}
-	
+	/**
+	 * Saves the current data from this.data into Meals.json.
+	 */
 	public void saveDataFile() {
 		//GENERATE THE PROPER JSON
 		JSONObject rootObject = new JSONObject();
@@ -112,15 +121,25 @@ public class MealListRepository {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Gets the JSON representation of an empty meal list.
+	 * @param foodFileName
+	 * @return
+	 */
 	private JSONObject getEmptyJSONMealList(String foodFileName) {
 		JSONObject rootObject = new JSONObject();
 		rootObject.put("dataSetFileName", foodFileName);
 		rootObject.put("meals", new JSONArray());
 		
 		return rootObject;
-		
 	}
 	
+	/**
+	 * Gets the JSON representation of a MealList
+	 * @param mealList
+	 * @return
+	 */
 	private JSONObject getJSONMealList(MealList mealList) {
 		JSONObject rootObject = new JSONObject();
 		
@@ -133,7 +152,12 @@ public class MealListRepository {
 		return rootObject;
 		
 	}
-
+	
+	/**
+	 * Gets the JSON representation of a Meal
+	 * @param meal
+	 * @return
+	 */
 	private JSONObject getJSONMeal(Meal meal) {
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("name", meal.getName());
@@ -153,15 +177,29 @@ public class MealListRepository {
 		return jsonObject;
 	}
 	
+	/**
+	 * Handles adding a new data file.
+	 * @param foodFileName
+	 */
 	public void addNewFoodDataFile(String foodFileName) {
 		if(foodFileName.contains("defaultFoodData.csv")) {return;}
 		this.data.put(foodFileName, new MealList(foodFileName));
 	}
 	
+	/**
+	 * 
+	 * @param foodFileName
+	 * @return true if there that food data file has been loaded before. 
+	 */
 	public boolean hasDataForFoodFile(String foodFileName) {
 		return this.data.containsKey(foodFileName);
 	}
 	
+	/**
+	 * Adds a meal into the mealList for the proper foodDataFile
+	 * @param meal
+	 * @param foodDataSetPath
+	 */
 	public void addNewMeal(Meal meal, String foodDataSetPath) {
 		MealList mealList = this.data.get(foodDataSetPath);
 		if(mealList.getMeals() == null) { mealList.setMeals(new ArrayList<Meal>());}
@@ -170,12 +208,22 @@ public class MealListRepository {
 		this.saveDataFile();
 	}
 	
-	
+	/**
+	 * Returns the mealList for the specified FoodListFilePath
+	 * @param foodListFilePath
+	 * @return
+	 */
 	public MealList GetForFoodListPath(String foodListFilePath){ //Returns the meallist for the specified FoodListFilePath
 		return this.data.get(foodListFilePath);
 								
 	}
 	
+	/**
+	 * 
+	 * @param foodListFilePath
+	 * @param mealID
+	 * @return The proper meal with the specified MealID, in the mealList assotiated with the specified foodListFilePath.
+	 */
 	public Meal GetMealForID(String foodListFilePath, UUID mealID) {
 		return this.GetForFoodListPath(foodListFilePath)
 				.getMeals()
