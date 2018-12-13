@@ -2,14 +2,18 @@ package Models;
 
 import java.util.ArrayList;
 
+/**
+ * Stores info for every meal
+ * @author A-Team 71=
+ */
 public class MealList {
 	
 	ArrayList<Meal> meals;	//List of every meal
 	String foodFileName;	//Name of the data file storing food informations
 
 	/**
-	 * Single variable constructor
-	 * @param foodFileName 
+	 * Creates a new MealList instance
+	 * @param foodFileName Name of database file
 	 */
 	public MealList(String foodFileName) {
 		this.foodFileName = foodFileName;

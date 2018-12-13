@@ -9,16 +9,16 @@ import Models.*;
 import Repositories.MealListRepository;
 
 /**
- * Handles data processing for meals, and acts as a separator from the UI and File IO.
+ * Handles data processing for meals, and acts as a separator from the UI and file I/O.
  * @author A-Team 71
  */
 public class MealListService {
-	private MealList meals;
 	
-	//There will be a list of meals associated with each FoodList, to ensure that we don’t have meals with foods from a different foods list loaded.
-	private String foodListFilePath;
-	
-	private MealListRepository mealListRepository; //The MealList repository that handles File IO for this set of meals.
+	//There will be a list of meals associated with each 
+	//FoodList, to ensure that we don’t have meals with foods from a different foods list loaded.
+	private MealList meals;							//List of meals, the list is unique to the file
+	private String foodListFilePath;				//Path to the food data file
+	private MealListRepository mealListRepository;	//The MealList repository that handles File IO for this set of meals.
 	
 	
 	public MealListService(String foodListFilePath) {
