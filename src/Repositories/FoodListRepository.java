@@ -10,26 +10,29 @@ import Models.FoodDataItem;
 /**
  * The class that handles File I/O for FoodItems
  * @author A-Team 71
- *
  */
 public class FoodListRepository {
-	ArrayList<FoodDataItem> data; //A de-serialized representation of the data in the specified filePath
-	String filePath; //The path to the File Asotiated with this repository. 
+	
+	ArrayList<FoodDataItem> data; //A deserialized representation of the data in the specified filePath
+	String filePath; //The path to the File Associated with this repository. 
 	
 	/**
 	 * Deserializes the file specified with filePath, populating this.data/
 	 * @param filePath
 	 */
 	public FoodListRepository(String filePath){
+		
 		this.filePath = filePath;
 		File inputF = new File(filePath);
+		
 		try {
 			
 			InputStream inputFS = new FileInputStream(inputF);
 			BufferedReader br = new BufferedReader(new InputStreamReader(inputFS));
-			
 			boolean isCleanFile = br.lines().findFirst().get().split(",").length == 12;
+			
 			if(isCleanFile) {
+				
 				//If its a new file, deserialize it, add a proper UUID to each Food Item, then serialize it again. 
 				this.data = (ArrayList<FoodDataItem>) br.lines()
 						.filter(Line -> Line.equals(",,,,,,,,,,,") == false)
@@ -39,29 +42,30 @@ public class FoodListRepository {
 				
 				this.data.stream().forEach(item -> item.setId(UUID.randomUUID()));
 				this.saveItems();
+				
 			}
-			else {
+			else
 				this.data = (ArrayList<FoodDataItem>) br.lines()
 						.filter(Line -> Line.equals(",,,,,,,,,,,") == false)
 						.map(Line -> Line.split(","))
 						.map(delimitedLine -> generateFoodItemFromString_Dirty(delimitedLine))
 						.collect(Collectors.toList());
-			}
 			
 			br.close();
 			
-		} catch (FileNotFoundException e) { e.printStackTrace(); }
-		catch (IOException e) {e.printStackTrace();}
+		} catch (FileNotFoundException e) { e.printStackTrace();
+		} catch (IOException e) {e.printStackTrace(); }
 		
 	}
 	
 	/**
 	 * Generates a FoodDataItem based on a delimited (by commas) line of the data file.
 	 * Assumes that delimited line has a proper UUID that we have added.
-	 * @param delimitedLine
-	 * @return
+	 * @param delimitedLine Line from data file
+	 * @return FoodDataItem created from data line
 	 */
 	private FoodDataItem generateFoodItemFromString_Clean(String[] delimitedLine) {
+		
 		FoodDataItem foodItem = new FoodDataItem();
 		foodItem.setGivenID(delimitedLine[0]);
 		foodItem.setName(delimitedLine[1]);
@@ -72,15 +76,17 @@ public class FoodListRepository {
 		foodItem.setProteinGrams(Double.parseDouble(delimitedLine[11]));
 		
 		return foodItem;
+		
 	}
 	
 	/**
 	 * Generates a FoodDataItem based on a delimited (by commas) line of the data file.
 	 * Assumes that delimited line DOES NOT have a proper UUID that we have added.
-	 * @param delimitedLine
-	 * @return
+	 * @param delimitedLine Line from data file
+	 * @return FoodDataItem created from data line
 	 */
 	private FoodDataItem generateFoodItemFromString_Dirty(String[] delimitedLine) {
+		
 		FoodDataItem foodItem = new FoodDataItem();
 		foodItem.setId(UUID.fromString(delimitedLine[0]));
 		foodItem.setGivenID(delimitedLine[1]);
@@ -92,6 +98,7 @@ public class FoodListRepository {
 		foodItem.setProteinGrams(Double.parseDouble(delimitedLine[12 ]));
 		
 		return foodItem;
+		
 	}
 	
 	/**
@@ -103,10 +110,11 @@ public class FoodListRepository {
 	
 	/**
 	 * Turns a FoodDataItem into a string that can be saved into a csv file.
-	 * @param foodItem
-	 * @return
+	 * @param foodItem Food item to convert
+	 * @return Processed string
 	 */
 	private String serializeFoodItem(FoodDataItem foodItem) {
+		
 		String result = "";
 		String ID = foodItem.getId().toString();
 		String givenID = foodItem.getGivenID();
@@ -127,24 +135,30 @@ public class FoodListRepository {
 		result += "protein," + proteinGrams;
 		
 		return result;
+		
 	}
 	
 	/**
 	 * Re-serializes the data stored by this repository into it's file.
 	 */
 	public void saveItems() {
+		
 		ArrayList<String> result = new ArrayList<String>();
 		for(FoodDataItem foodItem : this.data) {
 			result.add(serializeFoodItem(foodItem));
 		}
 		
 		try {
+			
 			FileWriter fileWriter;
 			fileWriter = new FileWriter(this.filePath);
 			PrintWriter printWriter = new PrintWriter(fileWriter);
+			
 			result.stream().forEach(line -> printWriter.print(line + "\n"));
-
 		    printWriter.close();
+		    
 		} catch (IOException e) { e.printStackTrace(); }
+		
 	}
+	
 }

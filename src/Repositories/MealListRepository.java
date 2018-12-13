@@ -1,36 +1,23 @@
 package Repositories;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
 import static java.lang.Math.toIntExact;
 
-import java.awt.event.ItemEvent;
-
-import javax.naming.OperationNotSupportedException;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
-import com.sun.media.jfxmedia.events.NewFrameEvent;
-
-import Models.Meal;
-import Models.MealItem;
-import Models.MealList;
+import Models.*;
 
 /**
  * Handles File Interaction for the list of meals. 
  * @author A-Team 71
- *
  */
+@SuppressWarnings("unchecked")
 public class MealListRepository {
 	HashMap<String, MealList> data;
 	JSONObject obj;
@@ -113,7 +100,6 @@ public class MealListRepository {
 		//SAVE THE JSON TO DISK
 		BufferedWriter writer;
 		try {
-			String s1 = rootObject.toString();
 			writer = new BufferedWriter(new FileWriter(MEALS_FILE_PATH));
 			writer.write(rootObject.toString());
 			writer.close();
@@ -128,11 +114,13 @@ public class MealListRepository {
 	 * @return
 	 */
 	private JSONObject getEmptyJSONMealList(String foodFileName) {
+		
 		JSONObject rootObject = new JSONObject();
 		rootObject.put("dataSetFileName", foodFileName);
 		rootObject.put("meals", new JSONArray());
 		
 		return rootObject;
+		
 	}
 	
 	/**
@@ -141,8 +129,8 @@ public class MealListRepository {
 	 * @return
 	 */
 	private JSONObject getJSONMealList(MealList mealList) {
-		JSONObject rootObject = new JSONObject();
 		
+		JSONObject rootObject = new JSONObject();
 		rootObject.put("dataSetFileName", mealList.getFoodFileName());
 		
 		JSONArray mealsJson = new JSONArray();
@@ -159,6 +147,7 @@ public class MealListRepository {
 	 * @return
 	 */
 	private JSONObject getJSONMeal(Meal meal) {
+		
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("name", meal.getName());
 		jsonObject.put("ID", meal.getID().toString());
@@ -168,13 +157,12 @@ public class MealListRepository {
 			JSONObject mealItemJSON = new JSONObject();
 			mealItemJSON.put("quantity", item.getQuantity());
 			mealItemJSON.put("foodID", item.getFood().toString());
-			
 			mealItems.add(mealItemJSON);
 		}
 		
 		jsonObject.put("mealItems", mealItems);
-		
 		return jsonObject;
+		
 	}
 	
 	/**
@@ -204,7 +192,6 @@ public class MealListRepository {
 		MealList mealList = this.data.get(foodDataSetPath);
 		if(mealList.getMeals() == null) { mealList.setMeals(new ArrayList<Meal>());}
 		mealList.getMeals().add(meal);
-		
 		this.saveDataFile();
 	}
 	
@@ -219,7 +206,6 @@ public class MealListRepository {
 	}
 	
 	/**
-	 * 
 	 * @param foodListFilePath
 	 * @param mealID
 	 * @return The proper meal with the specified MealID, in the mealList assotiated with the specified foodListFilePath.
@@ -231,4 +217,5 @@ public class MealListRepository {
 				.filter(meal -> meal.getID().equals(mealID))
 				.findFirst().get();
 	}
+	
 }

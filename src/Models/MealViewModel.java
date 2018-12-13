@@ -4,15 +4,25 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
+/**
+ * Stores relevant information to display a meal
+ * @author A-Team 71
+ */
 public class MealViewModel {
 	
-	private String mealName;
-	private HashMap<Nutrient, Double> nutrientInfo; //Maping the nutrient to the nutient value totals
-	private HashMap<Nutrient, Double> nutrientBarProgress; //Maping the nutrient to the proper value of the nutrient bar
-	private ArrayList<FoodViewModel> foods;
-	private UUID ID;
+	private String mealName;								//Name of meal
+	private HashMap<Nutrient, Double> nutrientInfo; 		//Mapping the nutrient to the nutrient value totals
+	private HashMap<Nutrient, Double> nutrientBarProgress; 	//Mapping the nutrient to the proper value of the nutrient bar
+	private ArrayList<FoodViewModel> foods;					//List of foods in the meal (only viewModels to display)
+	private UUID ID;										//ID of the meal
 
+	/**
+	 * Creates an instance of MealViewModel with the given parameters
+	 * @param meal Meal item
+	 * @param foods List of viewModels corresponding to constituent foods of the meal
+	 */
 	public MealViewModel(Meal meal, ArrayList<FoodDataItem> foods) {
+		
 		this.ID = meal.getID();
 		this.foods = new ArrayList<FoodViewModel>();
 		this.nutrientInfo = getZeroedOutNutrientMapper();
@@ -22,9 +32,8 @@ public class MealViewModel {
 		HashMap<UUID, FoodDataItem> foodMapper = new HashMap<UUID, FoodDataItem>();
 		foods.stream().forEach(food -> foodMapper.put(food.getId(), food));
 		
-		for(MealItem item : meal.getMealItems()) {
+		for(MealItem item : meal.getMealItems())
 			this.foods.add(new FoodViewModel(foodMapper.get(item.getFood()), item.getQuantity()));
-		}
 		
 		for(FoodViewModel vm : this.foods) {
 			nutrientInfo.put(Nutrient.CALORIES, nutrientInfo.get(Nutrient.CALORIES) + vm.getCalories());
@@ -42,7 +51,11 @@ public class MealViewModel {
 		
 	}
 	
+	/**
+	 * @return A HashMap with all nutrients mapped to zero (specifically a double)
+	 */
 	private HashMap<Nutrient, Double> getZeroedOutNutrientMapper() {
+		
 		HashMap<Nutrient, Double> result = new HashMap<Nutrient, Double>();
 		result.put(Nutrient.CALORIES, 0.0);
 		result.put(Nutrient.FATGRAMS, 0.0);

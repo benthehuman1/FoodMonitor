@@ -13,21 +13,10 @@ import Services.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
+
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Screen;
@@ -178,6 +167,7 @@ public class MainMenuController {
 							}
 							
 							if(m instanceof ComboBox<?>) {
+								@SuppressWarnings("unchecked")
 								String s = ((ComboBox<String>) m).getValue();
 								
 								if(s == null) {
@@ -802,7 +792,7 @@ public class MainMenuController {
 	}
 	
 	/**
-	 * Displays all meals assotiated with the current foodDataFile on the mealList.
+	 * Displays all meals associated with the current foodDataFile on the mealList.
 	 */
 	public void LoadDefaultMealList(){
 		ArrayList<MealListItem> mealListContents = (ArrayList<MealListItem>) this.mealService.GetAllMeals()
